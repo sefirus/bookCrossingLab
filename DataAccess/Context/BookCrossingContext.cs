@@ -12,7 +12,6 @@ public class BookCrossingContext : IdentityDbContext<User, IdentityRole<int>, in
     public DbSet<BookCopy> BookCopies { get; set; }
     public DbSet<Category> Categories { get; set; }    
     public DbSet<Comment> Comments { get; set; }
-    public DbSet<HistoryRecord> HistoryRecords { get; set; }
     public DbSet<Picture> Pictures { get; set; }
     public DbSet<Publisher> Publishers { get; set; }
     public DbSet<Shelf> Shelves { get; set; }

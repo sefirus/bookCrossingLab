@@ -14,6 +14,5 @@ public class User : IdentityUser<int>
         = new List<Comment>();    
     public IEnumerable<BookCopy> CurrentBooks { get; set; } 
         = new List<BookCopy>();
-    public IEnumerable<HistoryRecord> HistoryRecords { get; set; }
-        = new List<HistoryRecord>();
+    public DateTime CreatedAt { get; set; }
 }

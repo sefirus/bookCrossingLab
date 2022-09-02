@@ -8,8 +8,7 @@ public class Shelf
     public string Adress { get; set; }
     public IEnumerable<BookCopy> Books { get; set; } 
         = new List<BookCopy>();
-    public IEnumerable<HistoryRecord> HistoryRecords { get; set; } 
-        = new List<HistoryRecord>();
+    public DateTime CreatedAt { get; set; }
     public IEnumerable<Comment> Comments { get; set; } 
         = new List<Comment>();
 }

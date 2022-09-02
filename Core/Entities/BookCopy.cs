@@ -10,8 +10,9 @@ public class BookCopy
     public User CurrentUser { get; set; } 
     public int CurrentShelfId { get; set; } 
     public Shelf CurrentShelf { get; set; }
-    public IEnumerable<HistoryRecord> HistoryRecords { get; set; }
-        = new List<HistoryRecord>();
+    public DateTime CreatedAt { get; set; }
+    public User CreatedBy { get; set; }
+    public int CreatedById { get; set; }
     public IEnumerable<Comment> Comments { get; set; } 
         = new List<Comment>();
 }
