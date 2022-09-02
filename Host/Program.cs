@@ -23,7 +23,6 @@ builder.Services.AddSystemServices();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
 builder.Services.AddApplicationMappers();
-builder.Services.AddIdentityAndAuthorization();
 
 builder.Services.AddDbContext<BookCrossingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

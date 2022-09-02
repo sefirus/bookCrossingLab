@@ -10,8 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{7733D8BE-B4B7-4AE4-8AAC-3BF179FF4650}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{3ECB2968-547C-487E-BDFF-5C941FEF6824}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,9 +36,5 @@ Global
 		{7733D8BE-B4B7-4AE4-8AAC-3BF179FF4650}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7733D8BE-B4B7-4AE4-8AAC-3BF179FF4650}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7733D8BE-B4B7-4AE4-8AAC-3BF179FF4650}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3ECB2968-547C-487E-BDFF-5C941FEF6824}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3ECB2968-547C-487E-BDFF-5C941FEF6824}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3ECB2968-547C-487E-BDFF-5C941FEF6824}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3ECB2968-547C-487E-BDFF-5C941FEF6824}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

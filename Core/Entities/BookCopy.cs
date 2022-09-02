@@ -11,8 +11,6 @@ public class BookCopy
     public int CurrentShelfId { get; set; } 
     public Shelf CurrentShelf { get; set; }
     public DateTime CreatedAt { get; set; }
-    public User CreatedBy { get; set; }
-    public int CreatedById { get; set; }
     public IEnumerable<Comment> Comments { get; set; } 
         = new List<Comment>();
 }

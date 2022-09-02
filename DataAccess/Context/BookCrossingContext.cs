@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Context;
 
-public class BookCrossingContext : IdentityDbContext<User, IdentityRole<int>, int>
+public class BookCrossingContext : DbContext
 {
     public DbSet<Writer> Authors { get; set; }
     public DbSet<Book> Books { get; set; }

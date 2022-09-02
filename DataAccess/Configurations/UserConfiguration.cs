@@ -10,14 +10,30 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder
             .HasKey(u => u.Id);
+        
+        builder
+            .Property(u => u.Email)
+            .HasMaxLength(150);
 
+        // builder
+        //     .Property(u => u.PasswordHash)
+        //     .HasConversion<byte[]>()
+        //     .HasMaxLength(10000)
+        //     .IsRequired();
+        //
+        // builder
+        //     .Property(u => u.PasswordSalt)
+        //     .HasConversion<byte[]>()
+        //     .HasMaxLength(10000)
+        //     .IsRequired();
+        
         builder
             .Property(u => u.FirstName)
-            .HasMaxLength(50);
+            .HasMaxLength(150);
 
         builder
             .Property(u => u.LastName)
-            .HasMaxLength(50);
+            .HasMaxLength(150);
 
         builder
             .HasOne<Picture>(u => u.ProfilePicture)
