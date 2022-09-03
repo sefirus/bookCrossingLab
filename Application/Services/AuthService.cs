@@ -4,9 +4,9 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Core.Entities;
+using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
-using Core.ViewModels.UserViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -30,12 +30,12 @@ public class AuthService : IAuthService
             .GetFirstOrDefaultAsync(user => user.Email == email);
         if (foundUser is null)
         {
-            throw new Exception(); //TODO: Create custom exception 
+            throw new BadRequestException();
         }
 
         if (!VerifyUser(password, foundUser.PasswordHash, foundUser.PasswordSalt))
         {
-            //TODO: Create and throw custom exception 
+            throw new BadRequestException();
         }
         
         var token =  CreateToken(foundUser);
@@ -49,14 +49,7 @@ public class AuthService : IAuthService
         return computedHash.SequenceEqual(passwordHash);
     }
     
-    private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-    {
-        using var hmac = new HMACSHA512();
-        passwordSalt = hmac.Key;
-        passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-    }
-
-    private string CreateToken(User user)
+    public string CreateToken(User user)
     {
         var claims = new List<Claim>
         {
@@ -75,25 +68,5 @@ public class AuthService : IAuthService
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
         return jwt;
-    }
-
-    public async Task<string> NewUser(User newUser, string password)
-    {
-        var possiblyExisting = await _userRepository
-            .GetFirstOrDefaultAsync(u => u.Email == newUser.Email);
-        if (possiblyExisting is not null)
-        {
-            //TODO: Create and throw custom exception 
-            throw new Exception();
-        }
-        CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
-        newUser.PasswordHash = passwordHash;
-        newUser.PasswordSalt = passwordSalt;
-
-        await _userRepository.InsertAsync(newUser);
-        await _userRepository.SaveChangesAsync();
-        
-        var token = CreateToken(newUser);
-        return token;
     }
 }
