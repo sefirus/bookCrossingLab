@@ -38,7 +38,7 @@ public class AuthService : IAuthService
             throw new BadRequestException();
         }
         
-        var token =  CreateToken(foundUser);
+        var token = CreateToken(foundUser);
         return token;
     }
     
@@ -46,7 +46,8 @@ public class AuthService : IAuthService
     {
         using var hmac = new HMACSHA512(passwordSalt);
         var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return computedHash.SequenceEqual(passwordHash);
+        var equality = computedHash.SequenceEqual(passwordHash);
+        return equality;
     }
     
     public string CreateToken(User user)
@@ -54,7 +55,7 @@ public class AuthService : IAuthService
         var claims = new List<Claim>
         {
             new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, "User"),
+            new(ClaimTypes.Role, user.Role.Name),
             new(ClaimTypes.Expiration, DateTime.Now.AddSeconds(15).ToString(CultureInfo.CurrentCulture))
         };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(

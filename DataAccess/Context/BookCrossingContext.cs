@@ -16,6 +16,7 @@ public class BookCrossingContext : DbContext
     public DbSet<Publisher> Publishers { get; set; }
     public DbSet<Shelf> Shelves { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
 
     public BookCrossingContext(DbContextOptions<BookCrossingContext> options) 
         : base(options) { }
@@ -27,5 +28,7 @@ public class BookCrossingContext : DbContext
         builder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 
         builder.SeedCategories();
+        builder.SeedRoles();
+        builder.SeedUsers();
     }
 }

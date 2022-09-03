@@ -15,18 +15,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .Property(u => u.Email)
             .HasMaxLength(150);
 
-        // builder
-        //     .Property(u => u.PasswordHash)
-        //     .HasConversion<byte[]>()
-        //     .HasMaxLength(10000)
-        //     .IsRequired();
-        //
-        // builder
-        //     .Property(u => u.PasswordSalt)
-        //     .HasConversion<byte[]>()
-        //     .HasMaxLength(10000)
-        //     .IsRequired();
-        
         builder
             .Property(u => u.FirstName)
             .HasMaxLength(150);
@@ -39,7 +27,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasOne<Picture>(u => u.ProfilePicture)
             .WithOne(p => p.User)
             .HasForeignKey<User>(u => u.ProfilePictureId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
+        
+        builder
+            .HasOne<Role>(u => u.Role)
+            .WithMany(r => r.Users)
+            .HasForeignKey(u => u.RoleId);
 
         builder
             .ToTable("Users");

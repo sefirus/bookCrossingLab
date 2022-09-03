@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Core.Entities;
+﻿using Core.Entities;
 using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
@@ -24,18 +22,11 @@ public class UserService : IUserService
         {
             throw new BadRequestException();
         }
-        CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+        HashHelper.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
         newUser.PasswordHash = passwordHash;
         newUser.PasswordSalt = passwordSalt;
 
         await _userRepository.InsertAsync(newUser);
         await _userRepository.SaveChangesAsync();
-    }
-
-    private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-    {
-        using var hmac = new HMACSHA512();
-        passwordSalt = hmac.Key;
-        passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
     }
 }

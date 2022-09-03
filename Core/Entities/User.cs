@@ -13,8 +13,10 @@ public class User
     public DateTime BirthDate { get; set; }
     public bool IsActive { get; set; } = true;
     public bool ShowCurrentBooks { get; set; } = true; 
-    public Guid ProfilePictureId { get; set; }
+    public Guid? ProfilePictureId { get; set; }
     public Picture? ProfilePicture { get; set; }
+    public int RoleId { get; set; }
+    public Role Role { get; set; }
     public IEnumerable<Comment> Comments { get; set; } 
         = new List<Comment>();    
     public IEnumerable<BookCopy> CurrentBooks { get; set; } 

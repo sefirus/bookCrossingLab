@@ -1,21 +1,11 @@
-﻿using Core.Entities;
-using Microsoft.AspNetCore.Identity;
+﻿using Application.Services;
+using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess;
 
 public static class DataSeeder
 {
-    
-    public static void SeedRoles(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<IdentityRole<int>>().HasData(new[]
-        {
-            new IdentityRole<int>() {Id = 1, Name = "Admin", NormalizedName = "Admin".ToUpper()},
-            new IdentityRole<int>() {Id = 4, Name = "Client", NormalizedName = "Client".ToUpper()}
-        });
-    }
-    
     private static void AppendChildCategories(Category parentCategory, IEnumerable<Category> childCategories)
     {
         foreach (var cat in childCategories)
@@ -92,5 +82,54 @@ public static class DataSeeder
         modelBuilder
             .Entity<Category>()
             .HasData(resultList);
+    }
+
+    public static void SeedRoles(this ModelBuilder modelBuilder)
+    {
+        var roles = new Role[]
+        {
+            new Role() { Id = 1, Name = "Super Admin".ToUpper() },
+            new Role() { Id = 2, Name = "Power User".ToUpper() },
+            new Role() { Id = 3, Name = "User".ToUpper() }
+        };
+        
+        modelBuilder
+            .Entity<Role>()
+            .HasData(roles);
+    }
+
+    public static void SeedUsers(this ModelBuilder modelBuilder)
+    {
+        HashHelper.CreatePasswordHash("SuperAdminPassword", out var adminPasswordHash, out var  adminPasswordSalt);
+        var superAdmin = new User()
+        {
+            Id = 1,
+            BirthDate = new DateTime(2000, 1, 1),
+            CreatedAt = DateTime.Now,
+            Email = "admin@email.com",
+            FirstName = "Super",
+            LastName = "Admin",
+            RoleId = 1,
+            PasswordHash = adminPasswordHash,
+            PasswordSalt = adminPasswordSalt
+        };        
+        
+        HashHelper.CreatePasswordHash("PowerUserPassword", out var powerUserPasswordHash, out var  powerUserPasswordSalt);
+        var powerUser = new User()
+        {
+            Id = 2,
+            BirthDate = new DateTime(2000, 1, 1),
+            CreatedAt = DateTime.Now,
+            Email = "powerUser@email.com",
+            FirstName = "Power",
+            LastName = "User",
+            RoleId = 2,
+            PasswordHash = powerUserPasswordHash,
+            PasswordSalt = powerUserPasswordSalt
+        };
+
+        modelBuilder
+            .Entity<User>()
+            .HasData(superAdmin, powerUser);
     }
 }
