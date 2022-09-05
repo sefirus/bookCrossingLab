@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Enums;
 using Core.Exceptions;
+using Core.Interfaces.Mappers;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.ViewModels.BookViewModels;
@@ -99,14 +100,15 @@ public class BookService : IBookService
             var authorsList = book.BookWriters.Select(bw => bw.Writer).ToList();
             if (authorsList.Count > 0)
             {
-                bookAuthors = $"{bookAuthors}{authorsList.Last()}";
+                bookAuthors = $"{bookAuthors}{authorsList.Last().FullName}";
                 for (int i = 0; i < authorsList.Count - 1; i++)
                 {
-                    bookAuthors = $"{bookAuthors}{authorsList[i]}, ";
+                    bookAuthors = $"{bookAuthors}{authorsList[i].FullName}, ";
                 }
             }
 
             var vm = new SearchBookViewModel();
+            vm.Title = book.Title;
             vm.Id = book.Id.ToString();
             vm.Authors = bookAuthors;
             vm.SearchResultType = SearchResultType.Database;
@@ -123,7 +125,8 @@ public class BookService : IBookService
         var query = (await _bookRepository.QueryAsync(
                     include: prop =>
                         prop.Include(b => b.BookWriters)
-                            .ThenInclude(ba => ba.Writer))).AsEnumerable();
+                            .ThenInclude(ba => ba.Writer)
+                            .Include(b => b.Pictures))).AsEnumerable();
         
         var books = query.Where(b =>
             jw.Similarity(request, b.Title) > 0.55 || jw.Similarity(request, b.Description) > 0.55).ToList();
@@ -138,7 +141,8 @@ public class BookService : IBookService
         var query = (await _bookRepository.QueryAsync(
             include: prop =>
                 prop.Include(b => b.BookWriters)
-                    .ThenInclude(ba => ba.Writer))).AsEnumerable();
+                    .ThenInclude(ba => ba.Writer)
+                    .Include(b => b.Pictures))).AsEnumerable();
         
         var books = query.Where(b =>
             b.BookWriters.Select(bw => bw.Writer).Any(w => jw.Similarity(request, w.FullName) > 0.55))
