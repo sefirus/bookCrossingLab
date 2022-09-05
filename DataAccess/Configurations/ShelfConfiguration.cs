@@ -12,7 +12,8 @@ public class ShelfConfiguration : IEntityTypeConfiguration<Shelf>
             .HasKey(sh => sh.Id);
 
         builder
-            .Property(sh => sh.Adress);
+            .Property(sh => sh.FormattedAddress)
+            .HasMaxLength(150);
 
         builder
             .ToTable("Shelves");

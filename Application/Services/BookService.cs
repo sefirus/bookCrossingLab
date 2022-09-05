@@ -154,6 +154,10 @@ public class BookService : IBookService
 
     public async Task<IEnumerable<SearchBookViewModel>> SearchBookAsync(string request)
     {
+        if (string.IsNullOrEmpty(request))
+        {
+            return Enumerable.Empty<SearchBookViewModel>();
+        }
         var bookRequestUri = $"{_configuration["ApiAddresses:GoogleBooksUrl"]}?q=intitle:{request}";
         var authorRequestUri = $"{_configuration["ApiAddresses:GoogleBooksUrl"]}?q=inauthor:{request}";
         var partialSearchResults = await Task.WhenAll(
