@@ -55,11 +55,14 @@ public class AuthService : IAuthService
     
     public string CreateToken(User user)
     {
+        var expirationClaimValue = DateTime.Now
+            .AddSeconds(int.Parse(_configuration.GetSection("Authorization:TokenLifeSpan").Value))
+            .ToString(CultureInfo.CurrentCulture);
         var claims = new List<Claim>
         {
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Role, user.Role.Name),
-            new(ClaimTypes.Expiration, DateTime.Now.AddSeconds(15).ToString(CultureInfo.CurrentCulture))
+            new(ClaimTypes.Expiration, expirationClaimValue)
         };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
             _configuration.GetSection("Authorization:Token").Value));
