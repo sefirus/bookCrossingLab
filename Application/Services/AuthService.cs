@@ -7,6 +7,7 @@ using Core.Entities;
 using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -27,7 +28,9 @@ public class AuthService : IAuthService
     public async Task<string> Login(string email, string password)
     {
         var foundUser = await _userRepository
-            .GetFirstOrDefaultAsync(user => user.Email == email);
+            .GetFirstOrDefaultAsync(
+                filter: user => user.Email == email,
+                include: users => users.Include(u => u.Role));
         if (foundUser is null)
         {
             throw new BadRequestException();

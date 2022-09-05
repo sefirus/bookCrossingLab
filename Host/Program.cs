@@ -4,7 +4,9 @@ using BookCrossingBackEnd.Configuration;
 using BookCrossingBackEnd.Middleware;
 using DataAccess.Context;
 using DataAccess.Repositories.DiConfiguration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NLog;
 using WebApi.Controllers;
 using WebApi.Mappers.Configurations;
@@ -40,6 +42,19 @@ builder.Services
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(
+                builder.Configuration.GetSection("Authorization:Token").Value)),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+
+});
 
 var app = builder.Build();
 
@@ -53,6 +68,7 @@ app.UseCors(SystemServicesConfiguration.AllowedOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.UseMiddleware<ExceptionMiddleware>();
 
