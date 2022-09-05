@@ -4,11 +4,11 @@ using Core.ViewModels;
 
 namespace WebApi.Mappers;
 
-public class GenericPagedMapper<TSource, TDestination> : IPagedVmMapper<TSource, TDestination>
+public class PagedMapper<TSource, TDestination> : IPagedVmMapper<TSource, TDestination>
 {
     private readonly IEnumerableVmMapper<TSource, TDestination> _mapper;
 
-    public GenericPagedMapper(IEnumerableVmMapper<TSource, TDestination> mapper)
+    public PagedMapper(IEnumerableVmMapper<TSource, TDestination> mapper)
     {
         _mapper = mapper;
     }

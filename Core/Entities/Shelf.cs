@@ -3,6 +3,7 @@
 public class Shelf 
 {
     public int Id { get; set; }
+    public string Title { get; set; }
     public IEnumerable<Picture> Pictures { get; set; } 
         = new List<Picture>();
     public string FormattedAddress { get; set; }

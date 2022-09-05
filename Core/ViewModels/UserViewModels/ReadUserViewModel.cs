@@ -1,6 +1,6 @@
 ﻿namespace Core.ViewModels.UserViewModels;
 
-public class ReadUserVm : UserVmBase
+public class ReadUserViewModel : UserVmBase
 {
     public int Id { get; set; }
     public bool IsActive { get; set; } = true;
