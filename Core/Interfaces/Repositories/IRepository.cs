@@ -25,6 +25,11 @@ public interface IRepository<T> where T : class
         Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
         bool asNoTracking = false);
 
+    Task<T> GetFirstOrThrowAsync(
+        Expression<Func<T, bool>>? filter = null,
+        Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
+        bool asNoTracking = false);
+
     void Delete(T entity);
     void Update(T entity);
     Task InsertAsync(T entity);

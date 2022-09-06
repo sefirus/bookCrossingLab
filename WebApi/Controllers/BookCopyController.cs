@@ -23,6 +23,6 @@ public class BookCopyController : ControllerBase
     public async Task CreateBookCopy([FromBody]SearchBookViewModel bookViewModel)
     {
         var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
-        await _bookCopyService.AddBookCopy(bookViewModel, currentUser);
+        await _bookCopyService.CreateBookCopyAsync(bookViewModel, currentUser);
     }
 }

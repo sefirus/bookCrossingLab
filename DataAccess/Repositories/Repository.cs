@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Pagination;
 using Core.Pagination.Parameters;
@@ -93,6 +94,20 @@ public class Repository<T> : IRepository<T> where T : class
                 );
             
             return query.FirstOrDefault();
+        }
+
+        public async Task<T> GetFirstOrThrowAsync(
+            Expression<Func<T, bool>>? filter = null,
+            Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
+            bool asNoTracking = false)
+        {
+            var entity = await GetFirstOrDefaultAsync(filter: filter, include: include, asNoTracking: asNoTracking);
+            if (entity is null)
+            {
+                throw new NotFoundException($"Wanted {typeof(T).Name} does not exist");
+            }
+
+            return entity;
         }
 
         public void Delete(T entity)

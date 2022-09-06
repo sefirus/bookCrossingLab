@@ -2,6 +2,7 @@
 using Core.Pagination;
 using Core.Pagination.Parameters;
 using Core.ViewModels;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Core.Interfaces.Services;
 

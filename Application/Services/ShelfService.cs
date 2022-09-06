@@ -7,6 +7,7 @@ using Core.Interfaces.Services;
 using Core.Pagination;
 using Core.Pagination.Parameters;
 using Core.ViewModels;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Application.Services;

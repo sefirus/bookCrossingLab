@@ -5,5 +5,5 @@ namespace Core.Interfaces.Services;
 
 public interface IBookCopyService
 {
-    Task AddBookCopy(SearchBookViewModel model, User creator);
+    Task CreateBookCopyAsync(SearchBookViewModel model, User creator);
 }
