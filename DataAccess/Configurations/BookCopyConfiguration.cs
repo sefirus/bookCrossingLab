@@ -23,12 +23,14 @@ public class BookCopyConfiguration : IEntityTypeConfiguration<BookCopy>
         builder
             .HasOne<User>(bc => bc.CurrentUser)
             .WithMany(u => u.CurrentBooks)
-            .HasForeignKey(bc => bc.CurrentUserId);        
-        
+            .HasForeignKey(bc => bc.CurrentUserId)   
+            .IsRequired(false);
+
         builder
             .HasOne<Shelf>(bc => bc.CurrentShelf)
             .WithMany(sh => sh.Books)
-            .HasForeignKey(bc => bc.CurrentShelfId);
+            .HasForeignKey(bc => bc.CurrentShelfId)
+            .IsRequired(false);
 
         builder
             .ToTable("BookCopies");
