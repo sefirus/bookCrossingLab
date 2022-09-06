@@ -1,5 +1,6 @@
 ﻿using Core.Interfaces.Services;
 using Core.ViewModels.BookViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
@@ -24,5 +25,29 @@ public class BookCopyController : ControllerBase
     {
         var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
         await _bookCopyService.CreateBookCopyAsync(bookViewModel, currentUser);
+    }
+
+    [Authorize]
+    [HttpPatch("reserve/{id:int:min(1)}")]
+    public async Task ReserveBookCopy([FromRoute]int id)
+    {
+        var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+        await _bookCopyService.ReserveAsync(id, currentUser);
+    }
+
+    [Authorize]
+    [HttpPatch("return/{copyId:int:min(1)}")]
+    public async Task PutOnShelf([FromRoute] int copyId, [FromQuery]int shelfId)
+    {
+        var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+        await _bookCopyService.PutOnShelfAsync(copyId, currentUser, shelfId);
+    }
+
+    [Authorize]
+    [HttpPatch("take/{id:int:min(1)}")]
+    public async Task TakeFromShelf([FromRoute] int id)
+    {
+        var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+        await _bookCopyService.TakeFromShelfAsync(id, currentUser);
     }
 }

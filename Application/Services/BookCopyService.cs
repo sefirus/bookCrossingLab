@@ -50,11 +50,9 @@ public class BookCopyService : IBookCopyService
         await _bookCopyRepository.SaveChangesAsync();
     }
 
-    public async Task PutOnShelfAsync(int bookCopyId, int shelfId, User requestUser)
+    public async Task PutOnShelfAsync(int bookCopyId, User requestUser, int shelfId = 0)
     {
         var bookCopy = await _bookCopyRepository.GetFirstOrThrowAsync(bc => bc.Id == bookCopyId);
-        var shelf = await _shelfRepository.GetFirstOrThrowAsync(sh => sh.Id == shelfId);
-
         if (bookCopy.State == BookCopyState.Vacant || bookCopy.CurrentUserId != requestUser.Id)
         {
             throw new BadRequestException("BookCopy is already on the shelf or maintained by another user");
@@ -64,8 +62,43 @@ public class BookCopyService : IBookCopyService
         bookCopy.CurrentUserId = null;
         bookCopy.CurrentUser = null;
 
-        bookCopy.CurrentShelfId = shelfId;
-        bookCopy.CurrentShelf = shelf;
+        if (shelfId != 0)
+        {
+            var shelf = await _shelfRepository.GetFirstOrThrowAsync(sh => sh.Id == shelfId);
+            bookCopy.CurrentShelfId = shelfId;
+            bookCopy.CurrentShelf = shelf;
+        }
+
+        await _bookCopyRepository.SaveChangesAsync();
+    }
+
+    public async Task ReserveAsync(int bookCopyId, User requestUser)
+    {
+        var bookCopy = await _bookCopyRepository.GetFirstOrThrowAsync(bc => bc.Id == bookCopyId);
+        bookCopy.State = BookCopyState.Reserved;
+        bookCopy.CurrentUserId = requestUser.Id;
+        bookCopy.CurrentUser = requestUser;
+        await _bookCopyRepository.SaveChangesAsync();
+    }
+
+    public async Task TakeFromShelfAsync(int bookCopyId, User requestUser)
+    {
+        var bookCopy = await _bookCopyRepository.GetFirstOrThrowAsync(bc => bc.Id == bookCopyId);
+
+        if (bookCopy.State == BookCopyState.Vacant ||
+            (bookCopy.State == BookCopyState.Reserved && bookCopy.CurrentUserId == requestUser.Id))
+        {
+            bookCopy.State = BookCopyState.Maintained;
+            bookCopy.CurrentUserId = requestUser.Id;
+            bookCopy.CurrentUser = requestUser;
+            bookCopy.CurrentShelf = null;
+            bookCopy.CurrentShelfId = null;
+            await _bookCopyRepository.SaveChangesAsync();
+        }
+        else
+        {
+            throw new InvalidOperationException("You can`t take this book");
+        }
     }
     
     public async Task<PagedList<BookCopy>> GetBookCopiesByShelfIdAsync(int shelfId, ParametersBase parameters)
