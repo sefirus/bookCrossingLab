@@ -1,9 +1,12 @@
 ﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using Core.Entities;
+using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.Pagination;
 using Core.Pagination.Parameters;
+using Core.ViewModels;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Application.Services;
@@ -21,14 +24,13 @@ public class ShelfService : IShelfService
         _memoryCache = memoryCache;
     }
 
-    public async Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(
-        double northBound, double eastBound, double southBound, double westBound)
+    public async Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries)
     {
         var shelves = await _shelfRepository.QueryAsync(shelf =>
-            shelf.Longitude <= northBound 
-            && shelf.Longitude >= southBound 
-            && shelf.Latitude <= eastBound 
-            && shelf.Latitude >= westBound);
+            shelf.Longitude <= boundaries.North
+            && shelf.Longitude >= boundaries.South 
+            && shelf.Latitude <= boundaries.East
+            && shelf.Latitude >= boundaries.West);
         return shelves;
     }
 
@@ -71,12 +73,18 @@ public class ShelfService : IShelfService
     public async Task AddShelfAsync(Shelf shelf)
     {
         //TODO: add image uploading like in articles of vetClinic
+        shelf.CreatedAt = DateTime.Now;
         await _shelfRepository.InsertAsync(shelf);
         await _shelfRepository.SaveChangesAsync();
     }
 
-    public async Task DeleteShelfAsync(Shelf shelf)
+    public async Task DeleteShelfByIdAsync(int shelfId)
     {
+        var shelf = await _shelfRepository.GetFirstOrDefaultAsync(sh => sh.Id == shelfId);
+        if (shelf is null)
+        {
+            throw new NotFoundException($"Shelf with id {shelfId} does not exist");
+        }
         _shelfRepository.Delete(shelf);
         await _shelfRepository.SaveChangesAsync();
     }

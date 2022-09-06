@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Pagination;
 using Core.Pagination.Parameters;
+using Core.ViewModels;
 
 namespace Core.Interfaces.Services;
 
@@ -8,7 +9,6 @@ public interface IShelfService
 {
     public Task<PagedList<Shelf>> GetPagedShelvesAsync(ParametersBase parameters);
     public Task AddShelfAsync(Shelf shelf);
-    public Task DeleteShelfAsync(Shelf shelf);
-    public Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(
-        double northBound, double eastBound, double southBound, double westBound);
+    public Task DeleteShelfByIdAsync(int shelfId);
+    public Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries);
 }
