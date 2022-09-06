@@ -2,6 +2,7 @@
 using Core.Interfaces.Mappers;
 using Core.Interfaces.Services;
 using Core.ViewModels.CategoryViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
@@ -24,6 +25,7 @@ public class CategoryController : ControllerBase
         _createMapper = createMapper;
     }
     
+    [Authorize(Roles = "SUPER ADMIN")]
     [HttpGet]
     public async Task<ReadCategoryViewModel> GetCatalogAsync()
     {

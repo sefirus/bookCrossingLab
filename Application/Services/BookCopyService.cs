@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Enums;
+using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.ViewModels.BookViewModels;
 
@@ -7,23 +8,39 @@ namespace Application.Services;
 
 public class BookCopyService : IBookCopyService
 {
-    private readonly BookService _bookService;
+    private readonly IBookService _bookService;
+    private readonly IRepository<BookCopy> _bookCopyRepository;
 
-    public BookCopyService(BookService bookService)
+    public BookCopyService(
+        IBookService bookService, 
+        IRepository<BookCopy> bookCopyRepository)
     {
         _bookService = bookService;
+        _bookCopyRepository = bookCopyRepository;
     }
     
-    public async Task AddBookCopy(SearchBookViewModel model)
+    public async Task AddBookCopy(
+        SearchBookViewModel model,
+        User creator)
     {
-        Book book; 
+        Book baseBook; 
         if (model.SearchResultType == SearchResultType.GoogleBookApi)
         {
-            book = await _bookService.AddBookToLibraryAsync(model);
-        }
+            baseBook = await _bookService.AddBookToLibraryAsync(model);
+        }        
         else
         {
-            book = await _bookService.GetBookByViewModel(model);
+            baseBook = await _bookService.GetBookByViewModel(model);
         }
+        var newBookCopy = new BookCopy()
+        {
+            BookId = baseBook.Id,
+            Book = baseBook,
+            State = BookCopyState.Maintained,
+            CurrentUserId = creator.Id,
+            CurrentUser = creator
+        };
+        await _bookCopyRepository.InsertAsync(newBookCopy);
+        await _bookCopyRepository.SaveChangesAsync();
     }
 }

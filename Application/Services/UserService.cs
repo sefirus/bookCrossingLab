@@ -2,6 +2,7 @@
 using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Services;
 
@@ -28,5 +29,21 @@ public class UserService : IUserService
 
         await _userRepository.InsertAsync(newUser);
         await _userRepository.SaveChangesAsync();
+    }
+    
+    public async Task<User> GetCurrentUserAsync(HttpContext context)
+    {
+        var claim = context.User.Claims.FirstOrDefault(claim => claim.Type.Contains("emailaddress"));
+        if (claim is null)
+        {
+            throw new BadRequestException("The user is not logged in");
+        }
+        var user = await _userRepository.GetFirstOrDefaultAsync(u => u.Email == claim.Value);
+        if (user is null)
+        {
+            throw new NotFoundException("User with given email does not exist");
+        }
+
+        return user;
     }
 }

@@ -13,5 +13,6 @@ public static class ApplicationServicesConfigurations
         services.AddTransient<IAuthService, AuthService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IShelfService, ShelfService>();
+        services.AddTransient<IBookCopyService, BookCopyService>();
     }
 }
