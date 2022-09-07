@@ -59,6 +59,7 @@ public class ShelfController : ControllerBase
         return viewModels;
     }
 
+    [Authorize(Roles = "SUPER ADMIN,POWER USER")]
     [HttpPost]
     public async Task CreateShelf([FromBody] ShelfVmBase createVm)
     {
@@ -66,12 +67,14 @@ public class ShelfController : ControllerBase
         await _shelfService.AddShelfAsync(shelf);
     }
 
+    [Authorize(Roles = "SUPER ADMIN,POWER USER")]
     [HttpDelete("{id:int:min(1)}")]
     public async Task DeleteShelf([FromRoute] int id)
     {
         await _shelfService.DeleteShelfByIdAsync(id);
     }
 
+    [Authorize(Roles = "SUPER ADMIN,POWER USER")]
     [HttpGet("{id:int:min(1)}/qr")]
     public async Task<FileResult> GetQr([FromRoute] int id)
     {

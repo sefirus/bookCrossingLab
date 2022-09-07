@@ -22,4 +22,8 @@
       <PackageReference Include="FluentValidation.AspNetCore" Version="11.1.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Validators\ShelfValidators" />
+    </ItemGroup>
+
 </Project>

@@ -33,12 +33,14 @@ public class CategoryController : ControllerBase
         return viewModel;
     }    
     
+    [Authorize(Roles = "SUPER ADMIN,POWER USER")]
     [HttpDelete("{id:int:min(1)}")]
     public async Task DeleteCategoryByIdAsync([FromRoute]int id)
     {
         await _categoryService.DeleteCategoryAsync(id);
     }
 
+    [Authorize(Roles = "SUPER ADMIN,POWER USER")]
     [HttpPost]
     public async Task CreateCategoryAsync([FromBody]CreateCategoryViewModel viewModel)
     {
@@ -46,6 +48,7 @@ public class CategoryController : ControllerBase
         await _categoryService.CreateCategoryAsync(category);
     }
 
+    [Authorize(Roles = "SUPER ADMIN,POWER USER")]
     [HttpPut]
     public async Task UpdateCategoryAsync([FromBody] UpdateCategoryViewModel viewModel)
     {

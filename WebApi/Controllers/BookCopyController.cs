@@ -20,6 +20,7 @@ public class BookCopyController : ControllerBase
         _userService = userService;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task CreateBookCopy([FromBody]SearchBookViewModel bookViewModel)
     {

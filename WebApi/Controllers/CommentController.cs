@@ -2,6 +2,7 @@
 using Core.Interfaces.Mappers;
 using Core.Interfaces.Services;
 using Core.ViewModels.CommentViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
@@ -24,6 +25,7 @@ public class CommentController : ControllerBase
         _updateMapper = updateMapper;
     }
 
+    [Authorize]
     [HttpPut]
     public async Task UpdateComment([FromBody] UpdateCommentViewModel viewModel)
     {
@@ -33,6 +35,7 @@ public class CommentController : ControllerBase
         await _commentService.UpdateCommentAsync(comment);
     }
 
+    [Authorize]
     [HttpDelete("{id:int:min(1)}")]
     public async Task DeleteComment([FromRoute]int id)
     {
