@@ -11,4 +11,6 @@ public interface ICommentService
     public Task<PagedList<Comment>> GetPagedCommentsAsync(
         ParametersBase parameters,
         Expression<Func<Comment, bool>>? additionalFilter = null);
+    public Task DeleteCommentAsync(int commentId, User actor);
+    public Task UpdateCommentAsync(Comment newComment);
 }

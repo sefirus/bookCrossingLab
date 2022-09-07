@@ -25,5 +25,6 @@ public static class ApplicationMappersConfigurations
 
         services.AddTransient<IVmMapper<CreateCommentViewModel, Comment>, CreateCommentMapper>();
         services.AddTransient<IVmMapper<Comment, ReadCommentViewModel>, ReadCommentMapper>();
+        services.AddTransient<IVmMapper<UpdateCommentViewModel, Comment>, UpdateCommentMapper>();
     }
 }

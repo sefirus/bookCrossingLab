@@ -3,6 +3,7 @@ using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
@@ -38,12 +39,9 @@ public class UserService : IUserService
         {
             throw new BadRequestException("The user is not logged in");
         }
-        var user = await _userRepository.GetFirstOrDefaultAsync(u => u.Email == claim.Value);
-        if (user is null)
-        {
-            throw new NotFoundException("User with given email does not exist");
-        }
-
+        var user = await _userRepository.GetFirstOrThrowAsync(
+            filter: u => u.Email == claim.Value,
+            include: query => query.Include(u => u.Role));
         return user;
     }
 }

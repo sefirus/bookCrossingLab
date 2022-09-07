@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
 using Core.Entities;
+using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.Pagination;
 using Core.Pagination.Parameters;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
@@ -39,37 +39,11 @@ public class CommentService : ICommentService
         Expression<Func<Comment, bool>>? additionalFilter = null)
     {
         var paramFilter = GetFilterQuery(parameters.FilterParam);
-        Expression<Func<Comment, bool>>? finalFilter = null;
-        // Expression<Func<Comment, bool>>? finalFilter;
-        //
-        // if (additionalFilter is null)
-        // { 
-        //     finalFilter = paramFilter;
-        // }
-        // else
-        // {
-        //     var body = Expression.AndAlso(paramFilter, additionalFilter);
-        //     finalFilter = Expression.Lambda<Func<Comment,bool>>(body);
-        // }
-        //
-        // var invokedExpression  = Expression.Invoke(
-        //     paramFilter,
-        //     additionalFilter.Parameters);
-        //
-        // var combinedExpression = Expression.AndAlso(additionalFilter.Body, invokedExpression);
-        //
-        // var finalFilter = Expression.Lambda<Func<Comment, bool>>(combinedExpression, additionalFilter.Parameters);
-        if (additionalFilter is null && paramFilter is null)
+        Expression<Func<Comment, bool>>? finalFilter;
+
+        if (additionalFilter is null || paramFilter is null)
         {
-            finalFilter = null;
-        }
-        else if(additionalFilter is not null && paramFilter is null)
-        {
-            finalFilter = additionalFilter;
-        }
-        else if(additionalFilter is null && paramFilter is not null)
-        {
-            finalFilter = paramFilter;
+            finalFilter = additionalFilter ?? paramFilter;
         }
         else
         {
@@ -109,4 +83,28 @@ public class CommentService : ICommentService
         }
     }
 
+    public async Task UpdateCommentAsync(Comment newComment)
+    {
+        var oldComment = await _commentRepository.GetFirstOrThrowAsync(c => c.Id == newComment.Id);
+        if (oldComment.AuthorId != newComment.AuthorId)
+        {
+            throw new BadRequestException("You cant edit this comment");
+        }
+
+        oldComment.Edited = true;
+        oldComment.Content = newComment.Content;
+        oldComment.Rate = newComment.Rate;
+        await _commentRepository.SaveChangesAsync();
+    }
+
+    public async Task DeleteCommentAsync(int commentId, User actor)
+    {
+        var commentToDelete = await _commentRepository.GetFirstOrThrowAsync(c => c.Id == commentId);
+        if (commentToDelete.AuthorId != actor.Id && actor.Role.Name is not ("SUPER ADMIN" or "POWER USER"))
+        {
+            throw new BadRequestException("You cant delete this comment");
+        }
+        _commentRepository.Delete(commentToDelete);
+        await _commentRepository.SaveChangesAsync();
+    }
 }

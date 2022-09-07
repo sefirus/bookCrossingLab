@@ -4,14 +4,15 @@ using Core.ViewModels.CommentViewModels;
 
 namespace WebApi.Mappers.CommentMappers;
 
-public class CreateCommentMapper : IVmMapper<CreateCommentViewModel, Comment>
+public class UpdateCommentMapper : IVmMapper<UpdateCommentViewModel, Comment>
 {
-    public Comment Map(CreateCommentViewModel source)
+    public Comment Map(UpdateCommentViewModel source)
     {
         var comment = new Comment()
         {
-            Content = source.Content,
-            Rate = source.Rate
+            Id = source.Id,
+            Rate = source.Rate,
+            Content = source.Content
         };
         return comment;
     }
