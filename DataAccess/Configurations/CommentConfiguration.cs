@@ -25,18 +25,21 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
             .HasOne<Shelf>(comment => comment.Shelf)
             .WithMany(c => c.Comments)
             .HasForeignKey(comment => comment.ShelfId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);        
         
         builder
             .HasOne<BookCopy>(comment => comment.BookCopy)
             .WithMany(c => c.Comments)
             .HasForeignKey(comment => comment.BookCopyId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);        
         
         builder
             .HasOne<Book>(comment => comment.Book)
             .WithMany(c => c.Comments)
             .HasForeignKey(comment => comment.BookId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.ToTable("Comments");

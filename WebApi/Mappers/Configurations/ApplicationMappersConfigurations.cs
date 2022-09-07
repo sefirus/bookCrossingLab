@@ -1,9 +1,11 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Mappers;
 using Core.ViewModels.CategoryViewModels;
+using Core.ViewModels.CommentViewModels;
 using Core.ViewModels.ShelfViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using WebApi.Mappers.CategoryMappers;
+using WebApi.Mappers.CommentMappers;
 using WebApi.Mappers.ShelfMappers;
 
 namespace WebApi.Mappers.Configurations;
@@ -20,5 +22,7 @@ public static class ApplicationMappersConfigurations
 
         services.AddTransient<IVmMapper<Shelf, ReadShelfViewModel>, ReadShelfMapper>();
         services.AddTransient<IVmMapper<ShelfVmBase, Shelf>, CreateShelfMapper>();
+
+        services.AddTransient<IVmMapper<CreateCommentViewModel, Comment>, CreateCommentMapper>();
     }
 }

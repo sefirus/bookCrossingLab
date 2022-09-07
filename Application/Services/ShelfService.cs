@@ -17,11 +17,14 @@ namespace Application.Services;
 public class ShelfService : IShelfService
 {
     private readonly IRepository<Shelf> _shelfRepository;
+    private readonly ICommentService _commentService;
 
     public ShelfService(
-        IRepository<Shelf> shelfRepository)
+        IRepository<Shelf> shelfRepository,
+        ICommentService commentService)
     {
         _shelfRepository = shelfRepository;
+        _commentService = commentService;
     }
 
     public async Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries)
@@ -85,7 +88,7 @@ public class ShelfService : IShelfService
         await _shelfRepository.SaveChangesAsync();
     }
 
-    private async Task<Bitmap> GetShelfQrCodeAsync(int shelfId)
+    private async Task<Bitmap> GetShelfQrCodeBitmapAsync(int shelfId)
     {
         var shelf = await _shelfRepository.GetFirstOrThrowAsync(sh => sh.Id == shelfId);
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -97,9 +100,17 @@ public class ShelfService : IShelfService
 
     public async Task<byte[]> GetShelfQrCodeFileAsync(int shelfId)
     {
-        var bitmap = await GetShelfQrCodeAsync(shelfId);
+        var bitmap = await GetShelfQrCodeBitmapAsync(shelfId);
         var ms = new MemoryStream();
         bitmap.Save(ms, ImageFormat.Png);
         return ms.ToArray();
+    }
+
+    public async Task AddCommentOnShelfAsync(int shelfId, Comment newComment)
+    {
+        var shelf = await _shelfRepository.GetFirstOrThrowAsync(sh => sh.Id == shelfId);
+        newComment.ShelfId = shelfId;
+        newComment.Shelf = shelf;
+        await _commentService.CreateCommentAsync(newComment);
     }
 }
