@@ -20,6 +20,8 @@ public class ShelfController : ControllerBase
     private readonly IEnumerableVmMapper<Shelf, ReadShelfViewModel> _enumVmMapper;
     private readonly IVmMapper<CreateCommentViewModel, Comment> _createCommentMapper;
     private readonly IUserService _userService;
+    private readonly ICommentService _commentService;
+    private readonly IPagedVmMapper<Comment, ReadCommentViewModel> _commentMapper;
 
     public ShelfController(
         IShelfService shelfService,
@@ -27,7 +29,9 @@ public class ShelfController : ControllerBase
         IVmMapper<ShelfVmBase, Shelf> createShelfMapper,
         IEnumerableVmMapper<Shelf, ReadShelfViewModel> enumVmMapper, 
         IVmMapper<CreateCommentViewModel, Comment> createCommentMapper,
-        IUserService userService)
+        IUserService userService,
+        ICommentService commentService,
+        IPagedVmMapper<Comment, ReadCommentViewModel> commentMapper)
     {
         _shelfService = shelfService;
         _pagedMapper = pagedMapper;
@@ -35,6 +39,8 @@ public class ShelfController : ControllerBase
         _enumVmMapper = enumVmMapper;
         _createCommentMapper = createCommentMapper;
         _userService = userService;
+        _commentService = commentService;
+        _commentMapper = commentMapper;
     }
 
     [HttpGet]
@@ -81,5 +87,15 @@ public class ShelfController : ControllerBase
         var user = await _userService.GetCurrentUserAsync(HttpContext);
         newComment.AuthorId = user.Id;
         await _shelfService.AddCommentOnShelfAsync(id, newComment);
+    }
+
+    [HttpGet("{id:int:min(1)}/comments")]
+    public async Task<PagedViewModel<ReadCommentViewModel>> GetComments([FromRoute]int id, [FromQuery]ParametersBase parameters)
+    {
+        var comments = await _commentService.GetPagedCommentsAsync(
+            parameters: parameters,
+            additionalFilter: c => c.ShelfId == id);
+        var vm = _commentMapper.Map(comments);
+        return vm;
     }
 }

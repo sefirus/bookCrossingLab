@@ -11,7 +11,8 @@ public class CreateCommentMapper : IVmMapper<CreateCommentViewModel, Comment>
         var comment = new Comment()
         {
             AuthorId = source.AuthorId,
-            Content = source.Content
+            Content = source.Content,
+            Rate = source.Rate
         };
         return comment;
     }

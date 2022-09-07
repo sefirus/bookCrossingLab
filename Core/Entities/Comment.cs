@@ -8,6 +8,7 @@ public class Comment
     public bool Edited { get; set; }
     public DateTime CreatedAt { get; set; }
     public string Content { get; set; } 
+    public int Rate { get; set; }
     public int? ShelfId { get; set; }
     public Shelf Shelf { get; set; }
     public int? BookCopyId { get; set; }
