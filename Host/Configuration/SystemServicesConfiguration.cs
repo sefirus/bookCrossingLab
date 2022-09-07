@@ -1,12 +1,6 @@
 ﻿using Application.Services;
-using Core.Entities;
 using Core.Interfaces.Services;
-using DataAccess.Context;
-using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using WebApi.Validators.CategoryValidators;
 
 namespace BookCrossingBackEnd.Configuration;
