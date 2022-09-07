@@ -75,6 +75,10 @@ public class BookCopyService : IBookCopyService
     public async Task ReserveAsync(int bookCopyId, User requestUser)
     {
         var bookCopy = await _bookCopyRepository.GetFirstOrThrowAsync(bc => bc.Id == bookCopyId);
+        if (bookCopy.State != BookCopyState.Vacant)
+        {
+            throw new BadRequestException("You cant reserve this book");
+        }
         bookCopy.State = BookCopyState.Reserved;
         bookCopy.CurrentUserId = requestUser.Id;
         bookCopy.CurrentUser = requestUser;
@@ -97,7 +101,7 @@ public class BookCopyService : IBookCopyService
         }
         else
         {
-            throw new InvalidOperationException("You can`t take this book");
+            throw new BadRequestException("You can`t take this book");
         }
     }
     

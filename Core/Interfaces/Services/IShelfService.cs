@@ -2,7 +2,7 @@
 using Core.Pagination;
 using Core.Pagination.Parameters;
 using Core.ViewModels;
-using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Core.Interfaces.Services;
 
@@ -12,4 +12,5 @@ public interface IShelfService
     public Task AddShelfAsync(Shelf shelf);
     public Task DeleteShelfByIdAsync(int shelfId);
     public Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries);
+    public Task<byte[]> GetShelfQrCodeFileAsync(int shelfId);
 }

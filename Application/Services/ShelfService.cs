@@ -1,5 +1,6 @@
-﻿using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.Linq.Expressions;
 using Core.Entities;
 using Core.Exceptions;
 using Core.Interfaces.Repositories;
@@ -7,22 +8,20 @@ using Core.Interfaces.Services;
 using Core.Pagination;
 using Core.Pagination.Parameters;
 using Core.ViewModels;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using QRCoder;
 
 namespace Application.Services;
 
 public class ShelfService : IShelfService
 {
     private readonly IRepository<Shelf> _shelfRepository;
-    private readonly IMemoryCache _memoryCache;
 
     public ShelfService(
-        IRepository<Shelf> shelfRepository,
-        IMemoryCache memoryCache)
+        IRepository<Shelf> shelfRepository)
     {
         _shelfRepository = shelfRepository;
-        _memoryCache = memoryCache;
     }
 
     public async Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries)
@@ -50,14 +49,10 @@ public class ShelfService : IShelfService
     private static Expression<Func<Shelf, bool>>? GetFilterQuery(string? filterParam)
     {
         Expression<Func<Shelf, bool>>? filterQuery = null;
-
         if (filterParam is null) return filterQuery;
-        
         var formattedFilter = filterParam.Trim().ToLower();
-
         filterQuery = sh => sh.FormattedAddress.ToLower().Contains(formattedFilter)
                             || sh.Title!.ToLower().Contains(formattedFilter);
-
         return filterQuery;
     }
 
@@ -88,5 +83,23 @@ public class ShelfService : IShelfService
         }
         _shelfRepository.Delete(shelf);
         await _shelfRepository.SaveChangesAsync();
+    }
+
+    private async Task<Bitmap> GetShelfQrCodeAsync(int shelfId)
+    {
+        var shelf = await _shelfRepository.GetFirstOrThrowAsync(sh => sh.Id == shelfId);
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode(shelfId.ToString(), QRCodeGenerator.ECCLevel.Q);
+        QRCode qrCode = new QRCode(qrCodeData);
+        Bitmap qrCodeImage = qrCode.GetGraphic(10);
+        return qrCodeImage;
+    }
+
+    public async Task<byte[]> GetShelfQrCodeFileAsync(int shelfId)
+    {
+        var bitmap = await GetShelfQrCodeAsync(shelfId);
+        var ms = new MemoryStream();
+        bitmap.Save(ms, ImageFormat.Png);
+        return ms.ToArray();
     }
 }

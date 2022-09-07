@@ -1,9 +1,11 @@
-﻿using Core.Entities;
+﻿using System.Drawing;
+using Core.Entities;
 using Core.Interfaces.Mappers;
 using Core.Interfaces.Services;
 using Core.Pagination.Parameters;
 using Core.ViewModels;
 using Core.ViewModels.ShelfViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
@@ -56,5 +58,12 @@ public class ShelfController : ControllerBase
     public async Task DeleteShelf([FromRoute] int id)
     {
         await _shelfService.DeleteShelfByIdAsync(id);
+    }
+
+    [HttpGet("qr/{id:int:min(1)}")]
+    public async Task<FileResult> GetQr([FromRoute] int id)
+    {
+        var file = await _shelfService.GetShelfQrCodeFileAsync(id);
+        return File(file, "image/png");
     }
 }

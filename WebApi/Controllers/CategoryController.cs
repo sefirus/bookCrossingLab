@@ -25,7 +25,6 @@ public class CategoryController : ControllerBase
         _createMapper = createMapper;
     }
     
-    [Authorize(Roles = "SUPER ADMIN")]
     [HttpGet]
     public async Task<ReadCategoryViewModel> GetCatalogAsync()
     {
