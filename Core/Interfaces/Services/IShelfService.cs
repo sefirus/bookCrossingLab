@@ -13,4 +13,5 @@ public interface IShelfService
     public Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries);
     public Task<byte[]> GetShelfQrCodeFileAsync(int shelfId);
     public Task AddCommentOnShelfAsync(int shelfId, Comment newComment);
+    public Task<Shelf> GetShelfByIdAsync(int shelfId);
 }

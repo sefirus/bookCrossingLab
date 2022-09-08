@@ -1,12 +1,14 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Mappers;
 using Core.Interfaces.Services;
+using Core.Pagination;
 using Core.Pagination.Parameters;
 using Core.ViewModels;
 using Core.ViewModels.CommentViewModels;
 using Core.ViewModels.ShelfViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace WebApi.Controllers;
 
@@ -22,6 +24,7 @@ public class ShelfController : ControllerBase
     private readonly IUserService _userService;
     private readonly ICommentService _commentService;
     private readonly IPagedVmMapper<Comment, ReadCommentViewModel> _commentMapper;
+    private readonly IVmMapper<Shelf, ReadShelfViewModel> _readShelfMapper;
 
     public ShelfController(
         IShelfService shelfService,
@@ -31,7 +34,8 @@ public class ShelfController : ControllerBase
         IVmMapper<CreateCommentViewModel, Comment> createCommentMapper,
         IUserService userService,
         ICommentService commentService,
-        IPagedVmMapper<Comment, ReadCommentViewModel> commentMapper)
+        IPagedVmMapper<Comment, ReadCommentViewModel> commentMapper,
+        IVmMapper<Shelf, ReadShelfViewModel> readShelfMapper)
     {
         _shelfService = shelfService;
         _pagedMapper = pagedMapper;
@@ -41,6 +45,7 @@ public class ShelfController : ControllerBase
         _userService = userService;
         _commentService = commentService;
         _commentMapper = commentMapper;
+        _readShelfMapper = readShelfMapper;
     }
 
     [HttpGet]
@@ -49,6 +54,17 @@ public class ShelfController : ControllerBase
         var shelves = await _shelfService.GetPagedShelvesAsync(parameters);
         var viewModel = _pagedMapper.Map(shelves);
         return viewModel;
+    }
+
+    [HttpGet("{id:int:min(1)}")]
+    public async Task<ReadShelfViewModel> GetShelfById([FromRoute] int id)
+    {
+        var shelf = await _shelfService.GetShelfByIdAsync(id);
+        var shelfComments = shelf.Comments.ToList();
+        var pagedComments = new PagedList<Comment>(shelfComments, shelfComments.Count, 0, 25);
+        var vm = _readShelfMapper.Map(shelf);
+        vm.PagedComments = _commentMapper.Map(pagedComments);
+        return vm;
     }
 
     [HttpPost("geo")]

@@ -10,6 +10,7 @@ using Core.Pagination.Parameters;
 using Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using QRCoder;
 
 namespace Application.Services;
@@ -69,6 +70,16 @@ public class ShelfService : IShelfService
         }
     }
 
+    public async Task<Shelf> GetShelfByIdAsync(int shelfId)
+    {
+        var shelf = await _shelfRepository.GetFirstOrThrowAsync(
+            filter: sh => sh.Id == shelfId,
+            include: query => query.Include(sh => sh.Comments)
+                .Include(sh => sh.Books)
+                .Include(sh => sh.Pictures));
+        return shelf;
+    }
+    
     public async Task AddShelfAsync(Shelf shelf)
     {
         //TODO: add image uploading like in articles of vetClinic
