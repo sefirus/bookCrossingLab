@@ -7,10 +7,10 @@ namespace Core.Interfaces.Services;
 
 public interface ICommentService
 {
-    public Task CreateCommentAsync(Comment newComment);
-    public Task<PagedList<Comment>> GetPagedCommentsAsync(
+    Task CreateCommentAsync(Comment newComment);
+    Task<PagedList<Comment>> GetPagedCommentsAsync(
         ParametersBase parameters,
         Expression<Func<Comment, bool>>? additionalFilter = null);
-    public Task DeleteCommentAsync(int commentId, User actor);
-    public Task UpdateCommentAsync(Comment newComment);
+    Task DeleteCommentAsync(int commentId, User actor);
+    Task UpdateCommentAsync(Comment newComment);
 }

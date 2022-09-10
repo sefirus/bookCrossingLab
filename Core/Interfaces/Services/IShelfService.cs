@@ -7,11 +7,11 @@ namespace Core.Interfaces.Services;
 
 public interface IShelfService
 {
-    public Task<PagedList<Shelf>> GetPagedShelvesAsync(ParametersBase parameters);
-    public Task AddShelfAsync(Shelf shelf);
-    public Task DeleteShelfByIdAsync(int shelfId);
-    public Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries);
-    public Task<byte[]> GetShelfQrCodeFileAsync(int shelfId);
-    public Task AddCommentOnShelfAsync(int shelfId, Comment newComment);
-    public Task<Shelf> GetShelfByIdAsync(int shelfId);
+    Task<PagedList<Shelf>> GetPagedShelvesAsync(ParametersBase parameters);
+    Task AddShelfAsync(Shelf shelf);
+    Task DeleteShelfByIdAsync(int shelfId);
+    Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries);
+    Task<byte[]> GetShelfQrCodeFileAsync(int shelfId);
+    Task AddCommentOnShelfAsync(int shelfId, Comment newComment);
+    Task<Shelf> GetShelfByIdAsync(int shelfId);
 }

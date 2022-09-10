@@ -20,7 +20,8 @@ public class ReadBookCopyMapper : IVmMapper<BookCopy, ReadBookCopyViewModel>
         {
             Id = source.Id,
             State = source.State,
-            //BookCopyPictures = source.
+            BookCopyPictures = source.Pictures?
+                .Select(p => p.FullPath) ?? new List<string>(),
             Book = _readBookMapper.Map(source.Book),
             CurrentUserId = source.CurrentUserId ?? 0,
             CurrentUserName = source.CurrentUser?.FirstName + " " + source.CurrentUser?.LastName,

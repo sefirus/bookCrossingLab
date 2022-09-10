@@ -159,4 +159,20 @@ public class BookCopyService : IBookCopyService
             default: return null; 
         }
     }
+
+    public async Task<double> GetBookCopyRate(int bookCopyId)
+    {
+        var bookCopy =  await _bookCopyRepository.GetFirstOrThrowAsync(
+            filter: bc => bc.Id == bookCopyId,
+            include: query => query.Include(bc => bc.Comments));
+        var rate = GetBookCopyRate(bookCopy);
+        return rate;
+    }
+
+    public double GetBookCopyRate(BookCopy bookCopy)
+    {
+        var rate = bookCopy.Comments.Average(c => c.Rate);
+        return rate;
+    }
+
 }

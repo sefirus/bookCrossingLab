@@ -385,4 +385,19 @@ public class BookService : IBookService
         var book = await _bookRepository.GetFirstOrDefaultAsync();
         return book;
     }
+
+    public async Task<double> GetBookRate(int bookId)
+    {
+        var book = await _bookRepository.GetFirstOrThrowAsync(
+            filter: b => b.Id == bookId,
+            include: query => query.Include(b => b.Comments));
+        var rate = GetBookRate(book);
+        return rate;
+    }
+
+    public double GetBookRate(Book book)
+    {
+        var rate = book.Comments.Average(c => c.Rate);
+        return rate;
+    }
 }
