@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using System.Diagnostics;
+using Core.Entities;
 using Core.Enums;
 using Core.Exceptions;
 using Core.Interfaces.Mappers;
@@ -15,30 +16,28 @@ namespace Application.Services;
 
 public class BookService : IBookService
 {
-    private readonly IConfiguration _configuration;
-    private readonly IHttpClientFactory _clientFactory;
     private readonly IRepository<Book> _bookRepository;
     private readonly IRepository<Category> _categoryRepository;
     private readonly IRepository<Publisher> _publisherRepository;
     private readonly IRepository<Writer> _writerRepository;
+    private readonly ICommentService _commentService;
     private readonly ILoggerManager _logger;
 
     public BookService(
-        IConfiguration configuration, 
-        IHttpClientFactory clientFactory,
         IRepository<Book> bookRepository, 
         IRepository<Category> categoryRepository,
         ILoggerManager logger, 
         IRepository<Publisher> publisherRepository, 
-        IRepository<Writer> writerRepository)
+        IRepository<Writer> writerRepository,
+        ICommentService commentService)
     {
-        _configuration = configuration;
-        _clientFactory = clientFactory;
+
         _bookRepository = bookRepository;
         _categoryRepository = categoryRepository;
         _logger = logger;
         _publisherRepository = publisherRepository;
         _writerRepository = writerRepository;
+        _commentService = commentService;
     }
     
     public async Task<Book> GetBookByViewModel(SearchBookViewModel viewModel)
@@ -56,9 +55,26 @@ public class BookService : IBookService
         return rate;
     }
 
+    public async Task AddCommentOnBookAsync(int bookId, Comment newComment)
+    {
+        var book = await _bookRepository.GetFirstOrThrowAsync(b => b.Id == bookId);
+        newComment.BookId = bookId;
+        newComment.Book = book;
+        await _commentService.CreateCommentAsync(newComment);
+    }
+
     public double GetBookRate(Book book)
     {
-        var rate = book.Comments.Average(c => c.Rate);
+        double rate;
+        try
+        {
+            rate = book.Comments.Average(c => c.Rate);
+        }
+        catch (InvalidOperationException)
+        {
+            rate = 0;
+        }
+        
         return rate;
     }
 }

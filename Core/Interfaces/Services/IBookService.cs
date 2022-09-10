@@ -8,5 +8,5 @@ public interface IBookService
     Task<Book> GetBookByViewModel(SearchBookViewModel viewModel);
     double GetBookRate(Book book);
     Task<double> GetBookRate(int bookId);
-
+    Task AddCommentOnBookAsync(int bookId, Comment newComment);
 }

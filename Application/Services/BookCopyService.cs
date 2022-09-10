@@ -17,17 +17,19 @@ public class BookCopyService : IBookCopyService
     private readonly IRepository<BookCopy> _bookCopyRepository;
     private readonly IRepository<Shelf> _shelfRepository;
     private readonly IBookApiService _bookApiService;
+    private readonly ICommentService _commentService;
 
     public BookCopyService(
         IBookService bookService, 
         IRepository<BookCopy> bookCopyRepository, 
         IRepository<Shelf> shelfRepository, 
-        IBookApiService bookApiService)
+        IBookApiService bookApiService, ICommentService commentService)
     {
         _bookService = bookService;
         _bookCopyRepository = bookCopyRepository;
         _shelfRepository = shelfRepository;
         _bookApiService = bookApiService;
+        _commentService = commentService;
     }
     
     public async Task CreateBookCopyAsync(SearchBookViewModel model, User creator)
@@ -163,19 +165,12 @@ public class BookCopyService : IBookCopyService
         }
     }
 
-    public async Task<double> GetBookCopyRate(int bookCopyId)
+    public async Task AddCommentOnBookCopyAsync(int bookCopyId, Comment newComment)
     {
-        var bookCopy =  await _bookCopyRepository.GetFirstOrThrowAsync(
-            filter: bc => bc.Id == bookCopyId,
-            include: query => query.Include(bc => bc.Comments));
-        var rate = GetBookCopyRate(bookCopy);
-        return rate;
-    }
-
-    public double GetBookCopyRate(BookCopy bookCopy)
-    {
-        var rate = bookCopy.Comments.Average(c => c.Rate);
-        return rate;
+        var bookCopy = await _bookCopyRepository.GetFirstOrThrowAsync(b => b.Id == bookCopyId);
+        newComment.BookCopyId = bookCopyId;
+        newComment.BookCopy = bookCopy;
+        await _commentService.CreateCommentAsync(newComment);
     }
 
 }

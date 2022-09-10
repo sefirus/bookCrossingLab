@@ -76,6 +76,7 @@ public class ShelfService : IShelfService
             filter: sh => sh.Id == shelfId,
             include: query => query.Include(sh => sh.Comments)
                 .Include(sh => sh.BookCopies)
+                .ThenInclude(bc => bc.Book)
                 .Include(sh => sh.Pictures));
         return shelf;
     }

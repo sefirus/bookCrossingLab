@@ -9,4 +9,5 @@ public interface IBookCopyService
     Task PutOnShelfAsync(int bookCopyId, User requestUser, int shelfId = 0);
     Task ReserveAsync(int bookCopyId, User requestUser);
     Task TakeFromShelfAsync(int bookCopyId, User requestUser);
+    Task AddCommentOnBookCopyAsync(int bookCopyId, Comment newComment);
 }
