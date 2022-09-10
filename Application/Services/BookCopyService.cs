@@ -16,15 +16,18 @@ public class BookCopyService : IBookCopyService
     private readonly IBookService _bookService;
     private readonly IRepository<BookCopy> _bookCopyRepository;
     private readonly IRepository<Shelf> _shelfRepository;
+    private readonly IBookApiService _bookApiService;
 
     public BookCopyService(
         IBookService bookService, 
         IRepository<BookCopy> bookCopyRepository, 
-        IRepository<Shelf> shelfRepository)
+        IRepository<Shelf> shelfRepository, 
+        IBookApiService bookApiService)
     {
         _bookService = bookService;
         _bookCopyRepository = bookCopyRepository;
         _shelfRepository = shelfRepository;
+        _bookApiService = bookApiService;
     }
     
     public async Task CreateBookCopyAsync(SearchBookViewModel model, User creator)
@@ -32,7 +35,7 @@ public class BookCopyService : IBookCopyService
         Book baseBook; 
         if (model.SearchResultType == SearchResultType.GoogleBookApi)
         {
-            baseBook = await _bookService.AddBookToLibraryAsync(model);
+            baseBook = await _bookApiService.AddBookToLibraryAsync(model);
         }        
         else
         {

@@ -5,8 +5,6 @@ namespace Core.Interfaces.Services;
 
 public interface IBookService
 {
-    Task<IEnumerable<SearchBookViewModel>> SearchBookAsync(string request);
-    Task<Book> AddBookToLibraryAsync(SearchBookViewModel viewModel);
     Task<Book> GetBookByViewModel(SearchBookViewModel viewModel);
     double GetBookRate(Book book);
     Task<double> GetBookRate(int bookId);

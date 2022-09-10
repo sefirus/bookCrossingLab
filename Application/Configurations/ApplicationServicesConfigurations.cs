@@ -10,6 +10,7 @@ public static class ApplicationServicesConfigurations
     {
         services.AddTransient<ICategoryService, CategoryService>();
         services.AddTransient<IBookService, BookService>();
+        services.AddTransient<IBookApiService, BookApiService>();
         services.AddTransient<IAuthService, AuthService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IShelfService, ShelfService>();

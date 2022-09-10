@@ -12,6 +12,11 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
             .HasKey(b => b.Id);
 
         builder
+            .Property(b => b.GoogleApiId)
+            .HasMaxLength(50)
+            .IsRequired(false);
+
+        builder
             .Property(b => b.Title)
             .HasMaxLength(500);        
         
