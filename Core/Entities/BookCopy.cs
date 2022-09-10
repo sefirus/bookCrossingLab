@@ -15,4 +15,6 @@ public class BookCopy
     public DateTime CreatedAt { get; set; }
     public IEnumerable<Comment> Comments { get; set; } 
         = new List<Comment>();
+    public IEnumerable<Picture> Pictures { get; set; }
+        = new List<Picture>();
 }

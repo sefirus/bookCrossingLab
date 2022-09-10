@@ -27,6 +27,13 @@ public class PictureConfiguration : IEntityTypeConfiguration<Picture>
             .HasForeignKey(p => p.BookId)
             .OnDelete(DeleteBehavior.Restrict)            
             .IsRequired(false);
+        
+        builder
+            .HasOne<BookCopy>(p => p.BookCopy)
+            .WithMany(b => b.Pictures)
+            .HasForeignKey(p => p.BookCopyId)
+            .OnDelete(DeleteBehavior.Restrict)            
+            .IsRequired(false);
 
         builder
             .HasOne<Publisher>(p => p.Publisher)
