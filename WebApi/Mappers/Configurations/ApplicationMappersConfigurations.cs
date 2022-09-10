@@ -1,9 +1,13 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Mappers;
+using Core.ViewModels.BookCopyViewModels;
+using Core.ViewModels.BookViewModels;
 using Core.ViewModels.CategoryViewModels;
 using Core.ViewModels.CommentViewModels;
 using Core.ViewModels.ShelfViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using WebApi.Mappers.BookCopyMappers;
+using WebApi.Mappers.BookMappers;
 using WebApi.Mappers.CategoryMappers;
 using WebApi.Mappers.CommentMappers;
 using WebApi.Mappers.ShelfMappers;
@@ -26,5 +30,9 @@ public static class ApplicationMappersConfigurations
         services.AddTransient<IVmMapper<CreateCommentViewModel, Comment>, CreateCommentMapper>();
         services.AddTransient<IVmMapper<Comment, ReadCommentViewModel>, ReadCommentMapper>();
         services.AddTransient<IVmMapper<UpdateCommentViewModel, Comment>, UpdateCommentMapper>();
+
+        services.AddTransient<IVmMapper<BookCopy, ReadBookCopyViewModel>, ReadBookCopyMapper>();
+        
+        services.AddTransient<IVmMapper<Book, ReadBookViewModel>, ReadBookMapper>();
     }
 }

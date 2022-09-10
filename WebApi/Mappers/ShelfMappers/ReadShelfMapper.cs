@@ -17,6 +17,10 @@ public class ReadShelfMapper : IVmMapper<Shelf, ReadShelfViewModel>
             Longitude = source.Longitude,
             CreatedAt = source.CreatedAt
         };
+        if (source.Pictures is not null)
+        {
+            shelfVm.Pictures = source.Pictures.Select(p => p.FullPath);
+        }
         return shelfVm;
     }
 }

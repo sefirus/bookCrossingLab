@@ -9,7 +9,7 @@ public class PagedList<T>
     public bool HasPrevious => CurrentPage > 1;
     public bool HasNext => CurrentPage < TotalPages;
     public List<T> Entities = new();
-    public PagedList(IEnumerable<T> items, int count, int pageNumber, int pageSize)
+    public PagedList(IEnumerable<T> items, int count, int pageNumber = 1, int pageSize = 25)
     {
         TotalCount = count;
         PageSize = pageSize;

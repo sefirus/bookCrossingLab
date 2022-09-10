@@ -9,7 +9,7 @@ public class Shelf
     public string FormattedAddress { get; set; }
     public double Latitude { get; set; }
     public double Longitude { get; set; }
-    public IEnumerable<BookCopy> Books { get; set; } 
+    public IEnumerable<BookCopy> BookCopies { get; set; } 
         = new List<BookCopy>();
     public DateTime CreatedAt { get; set; }
     public IEnumerable<Comment> Comments { get; set; } 

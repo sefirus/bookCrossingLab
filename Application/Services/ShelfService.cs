@@ -75,7 +75,7 @@ public class ShelfService : IShelfService
         var shelf = await _shelfRepository.GetFirstOrThrowAsync(
             filter: sh => sh.Id == shelfId,
             include: query => query.Include(sh => sh.Comments)
-                .Include(sh => sh.Books)
+                .Include(sh => sh.BookCopies)
                 .Include(sh => sh.Pictures));
         return shelf;
     }

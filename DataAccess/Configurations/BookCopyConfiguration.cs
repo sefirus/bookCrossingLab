@@ -28,7 +28,7 @@ public class BookCopyConfiguration : IEntityTypeConfiguration<BookCopy>
 
         builder
             .HasOne<Shelf>(bc => bc.CurrentShelf)
-            .WithMany(sh => sh.Books)
+            .WithMany(sh => sh.BookCopies)
             .HasForeignKey(bc => bc.CurrentShelfId)
             .IsRequired(false);
 

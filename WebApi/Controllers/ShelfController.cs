@@ -4,11 +4,11 @@ using Core.Interfaces.Services;
 using Core.Pagination;
 using Core.Pagination.Parameters;
 using Core.ViewModels;
+using Core.ViewModels.BookCopyViewModels;
 using Core.ViewModels.CommentViewModels;
 using Core.ViewModels.ShelfViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace WebApi.Controllers;
 
@@ -23,8 +23,9 @@ public class ShelfController : ControllerBase
     private readonly IVmMapper<CreateCommentViewModel, Comment> _createCommentMapper;
     private readonly IUserService _userService;
     private readonly ICommentService _commentService;
-    private readonly IPagedVmMapper<Comment, ReadCommentViewModel> _commentMapper;
+    private readonly IPagedVmMapper<Comment, ReadCommentViewModel> _pagedCommentMapper;
     private readonly IVmMapper<Shelf, ReadShelfViewModel> _readShelfMapper;
+    private readonly IPagedVmMapper<BookCopy, ReadBookCopyViewModel> _pagedBookCopyMapper;
 
     public ShelfController(
         IShelfService shelfService,
@@ -34,8 +35,9 @@ public class ShelfController : ControllerBase
         IVmMapper<CreateCommentViewModel, Comment> createCommentMapper,
         IUserService userService,
         ICommentService commentService,
-        IPagedVmMapper<Comment, ReadCommentViewModel> commentMapper,
-        IVmMapper<Shelf, ReadShelfViewModel> readShelfMapper)
+        IPagedVmMapper<Comment, ReadCommentViewModel> pagedCommentMapper,
+        IVmMapper<Shelf, ReadShelfViewModel> readShelfMapper,
+        IPagedVmMapper<BookCopy, ReadBookCopyViewModel> pagedBookCopyMapper)
     {
         _shelfService = shelfService;
         _pagedMapper = pagedMapper;
@@ -44,8 +46,9 @@ public class ShelfController : ControllerBase
         _createCommentMapper = createCommentMapper;
         _userService = userService;
         _commentService = commentService;
-        _commentMapper = commentMapper;
+        _pagedCommentMapper = pagedCommentMapper;
         _readShelfMapper = readShelfMapper;
+        _pagedBookCopyMapper = pagedBookCopyMapper;
     }
 
     [HttpGet]
@@ -61,9 +64,12 @@ public class ShelfController : ControllerBase
     {
         var shelf = await _shelfService.GetShelfByIdAsync(id);
         var shelfComments = shelf.Comments.ToList();
-        var pagedComments = new PagedList<Comment>(shelfComments, shelfComments.Count, 0, 25);
+        var pagedComments = new PagedList<Comment>(shelfComments, shelfComments.Count);
+        var shelfBookCopies = shelf.BookCopies.ToList();
+        var pagedBookCopies = new PagedList<BookCopy>(shelfBookCopies, shelfBookCopies.Count);
         var vm = _readShelfMapper.Map(shelf);
-        vm.PagedComments = _commentMapper.Map(pagedComments);
+        vm.PagedComments = _pagedCommentMapper.Map(pagedComments);
+        vm.PagedBookCopies = _pagedBookCopyMapper.Map(pagedBookCopies);
         return vm;
     }
 
@@ -114,7 +120,7 @@ public class ShelfController : ControllerBase
         var comments = await _commentService.GetPagedCommentsAsync(
             parameters: parameters,
             additionalFilter: c => c.ShelfId == id);
-        var vm = _commentMapper.Map(comments);
+        var vm = _pagedCommentMapper.Map(comments);
         return vm;
     }
 }
