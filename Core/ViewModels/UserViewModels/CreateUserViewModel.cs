@@ -2,6 +2,6 @@
 
 public class CreateUserViewModel : UserVmBase
 {
-    public string? ProfilePicture { get; init; }
-    public string? Password { get; init; }
+    public string? ProfilePicture { get; set; }
+    public string? Password { get; set; }
 }
