@@ -4,9 +4,9 @@ using Core.ViewModels.ShelfViewModels;
 
 namespace WebApi.Mappers.ShelfMappers;
 
-public class CreateShelfMapper : IVmMapper<ShelfVmBase, Shelf>
+public class CreateShelfMapper : IVmMapper<CreateShelfViewModel, Shelf>
 {
-    public Shelf Map(ShelfVmBase source)
+    public Shelf Map(CreateShelfViewModel source)
     {
         var shelf = new Shelf()
         {

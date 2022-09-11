@@ -9,6 +9,7 @@ using Core.ViewModels.CommentViewModels;
 using Core.ViewModels.ShelfViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Mappers.ShelfMappers;
 
 namespace WebApi.Controllers;
 
@@ -18,7 +19,7 @@ public class ShelfController : ControllerBase
 {
     private readonly IShelfService _shelfService;
     private readonly IPagedVmMapper<Shelf, ReadShelfViewModel> _pagedMapper;
-    private readonly IVmMapper<ShelfVmBase, Shelf> _createShelfMapper;
+    private readonly IVmMapper<CreateShelfViewModel, Shelf> _createShelfMapper;
     private readonly IEnumerableVmMapper<Shelf, ReadShelfViewModel> _enumVmMapper;
     private readonly IVmMapper<CreateCommentViewModel, Comment> _createCommentMapper;
     private readonly IUserService _userService;
@@ -30,7 +31,7 @@ public class ShelfController : ControllerBase
     public ShelfController(
         IShelfService shelfService,
         IPagedVmMapper<Shelf, ReadShelfViewModel> pagedMapper,
-        IVmMapper<ShelfVmBase, Shelf> createShelfMapper,
+        IVmMapper<CreateShelfViewModel, Shelf> createShelfMapper,
         IEnumerableVmMapper<Shelf, ReadShelfViewModel> enumVmMapper, 
         IVmMapper<CreateCommentViewModel, Comment> createCommentMapper,
         IUserService userService,
@@ -83,7 +84,7 @@ public class ShelfController : ControllerBase
 
     [Authorize(Roles = "SUPER ADMIN,POWER USER")]
     [HttpPost]
-    public async Task CreateShelf([FromBody] ShelfVmBase createVm)
+    public async Task CreateShelf([FromBody] CreateShelfViewModel createVm)
     {
         var shelf = _createShelfMapper.Map(createVm);
         await _shelfService.AddShelfAsync(shelf);

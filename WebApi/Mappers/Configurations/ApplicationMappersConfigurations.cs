@@ -25,7 +25,7 @@ public static class ApplicationMappersConfigurations
         services.AddTransient<IVmMapper<CreateCategoryViewModel, Category>, CreateCategoryVmMapper>();
 
         services.AddTransient<IVmMapper<Shelf, ReadShelfViewModel>, ReadShelfMapper>();
-        services.AddTransient<IVmMapper<ShelfVmBase, Shelf>, CreateShelfMapper>();
+        services.AddTransient<IVmMapper<CreateShelfViewModel, Shelf>, CreateShelfMapper>();
 
         services.AddTransient<IVmMapper<CreateCommentViewModel, Comment>, CreateCommentMapper>();
         services.AddTransient<IVmMapper<Comment, ReadCommentViewModel>, ReadCommentMapper>();

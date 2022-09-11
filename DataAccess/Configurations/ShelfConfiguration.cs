@@ -13,7 +13,11 @@ public class ShelfConfiguration : IEntityTypeConfiguration<Shelf>
 
         builder
             .Property(sh => sh.FormattedAddress)
-            .HasMaxLength(150);
+            .HasMaxLength(250);
+
+        builder
+            .Property(sh => sh.Title)
+            .HasMaxLength(250);
 
         builder
             .ToTable("Shelves");
