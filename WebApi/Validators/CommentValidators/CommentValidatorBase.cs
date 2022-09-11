@@ -1,11 +1,23 @@
-﻿namespace WebApi.Validators.CommentValidators;
+﻿using Core.ViewModels.CommentViewModels;
+using FluentValidation;
 
-public class CommentValidatorBase
+namespace WebApi.Validators.CommentValidators;
+
+public class CommentValidatorBase<T> : AbstractValidator<T> where T : CommentVmBase
 {
-    //TODO: implement validators
-    //TODO: add comments to already implemented entities like bookCopies and books 
-    //TODO: add bookCopy search methods (including geo search):
-    // ^Possibly give bookCopies with book in get by id 
-    //TODO: complete full CRUD on books and bookCopies
-    //TODO: maybe implement creating book with missing properties (fill in whats missing)  
+    public CommentValidatorBase()
+    {
+        RuleFor(c => c.Content)
+            .MaximumLength(400)
+            .WithMessage("Maximum content length must be lower than 400")
+            .MinimumLength(1)
+            .WithMessage("Minimum content length must be greater than 1");
+
+        RuleFor(c => c.Rate)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Rate must be greater than or equal to 0")
+            .LessThanOrEqualTo(5)
+            .WithMessage("Rate mus ne lower than or equal to 5");
+
+    }
 }
