@@ -1,42 +1,25 @@
-﻿using System.Diagnostics;
-using Core.Entities;
-using Core.Enums;
-using Core.Exceptions;
-using Core.Interfaces.Mappers;
+﻿using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Core.Pagination;
+using Core.Pagination.Parameters;
 using Core.ViewModels.BookViewModels;
-using Core.ViewModels.BookViewModels.GoogleBookApiRequests;
-using F23.StringSimilarity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 
 namespace Application.Services;
 
 public class BookService : IBookService
 {
     private readonly IRepository<Book> _bookRepository;
-    private readonly IRepository<Category> _categoryRepository;
-    private readonly IRepository<Publisher> _publisherRepository;
-    private readonly IRepository<Writer> _writerRepository;
     private readonly ICommentService _commentService;
-    private readonly ILoggerManager _logger;
 
     public BookService(
-        IRepository<Book> bookRepository, 
-        IRepository<Category> categoryRepository,
-        ILoggerManager logger, 
-        IRepository<Publisher> publisherRepository, 
-        IRepository<Writer> writerRepository,
+        IRepository<Book> bookRepository,
         ICommentService commentService)
     {
 
         _bookRepository = bookRepository;
-        _categoryRepository = categoryRepository;
-        _logger = logger;
-        _publisherRepository = publisherRepository;
-        _writerRepository = writerRepository;
+
         _commentService = commentService;
     }
     
@@ -61,6 +44,11 @@ public class BookService : IBookService
         newComment.BookId = bookId;
         newComment.Book = book;
         await _commentService.CreateCommentAsync(newComment);
+    }
+
+    public Task<PagedList<Book>> GetFilteredBooksAsync(BookParameters parameters)
+    {
+        throw new NotImplementedException();
     }
 
     public double GetBookRate(Book book)
