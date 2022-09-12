@@ -20,13 +20,15 @@ public class BookController : ControllerBase
     private readonly IPagedVmMapper<Comment, ReadCommentViewModel> _pagedCommentMapper;
     private readonly ICommentService _commentService;
     private readonly IUserService _userService;
+    private readonly IPagedVmMapper<Book, ReadBookViewModel> _pagedBookMapper;
 
     public BookController(
         IBookService bookService, 
         IBookApiService bookApiService, 
         IVmMapper<CreateCommentViewModel, Comment> createCommentMapper,
         IPagedVmMapper<Comment, ReadCommentViewModel> pagedCommentMapper,
-        ICommentService commentService, IUserService userService)
+        ICommentService commentService, IUserService userService, 
+        IPagedVmMapper<Book, ReadBookViewModel> pagedBookMapper)
     {
         _bookService = bookService;
         _bookApiService = bookApiService;
@@ -34,6 +36,7 @@ public class BookController : ControllerBase
         _pagedCommentMapper = pagedCommentMapper;
         _commentService = commentService;
         _userService = userService;
+        _pagedBookMapper = pagedBookMapper;
     }
 
     [HttpGet]
@@ -61,12 +64,20 @@ public class BookController : ControllerBase
     }
     
     [HttpGet("{id:int:min(1)}/comments")]
-    public async Task<PagedViewModel<ReadCommentViewModel>> GetComments([FromRoute]int id, [FromQuery]ParametersBase parameters)
+    public async Task<PagedViewModel<ReadCommentViewModel>> GetComments(
+        [FromRoute]int id, 
+        [FromQuery]FilteredParameters parameters)
     {
         var comments = await _commentService.GetPagedCommentsAsync(
             parameters: parameters,
             additionalFilter: c => c.BookId == id);
         var vm = _pagedCommentMapper.Map(comments);
         return vm;
+    }
+
+    [HttpPost("filtered")]
+    public async Task GetFilteredBooks([FromBody]BookParameters parameters)
+    {
+        
     }
 }

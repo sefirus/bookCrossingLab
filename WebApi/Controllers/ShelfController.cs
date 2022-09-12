@@ -53,7 +53,7 @@ public class ShelfController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<PagedViewModel<ReadShelfViewModel>> GetPagedShelves([FromQuery] ParametersBase parameters)
+    public async Task<PagedViewModel<ReadShelfViewModel>> GetPagedShelves([FromQuery]FilteredParameters parameters)
     {
         var shelves = await _shelfService.GetPagedShelvesAsync(parameters);
         var viewModel = _pagedMapper.Map(shelves);
@@ -116,7 +116,7 @@ public class ShelfController : ControllerBase
     }
 
     [HttpGet("{id:int:min(1)}/comments")]
-    public async Task<PagedViewModel<ReadCommentViewModel>> GetComments([FromRoute]int id, [FromQuery]ParametersBase parameters)
+    public async Task<PagedViewModel<ReadCommentViewModel>> GetComments([FromRoute]int id, [FromQuery]FilteredParameters parameters)
     {
         var comments = await _commentService.GetPagedCommentsAsync(
             parameters: parameters,

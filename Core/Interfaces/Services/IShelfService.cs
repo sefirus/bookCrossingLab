@@ -7,7 +7,7 @@ namespace Core.Interfaces.Services;
 
 public interface IShelfService
 {
-    Task<PagedList<Shelf>> GetPagedShelvesAsync(ParametersBase parameters);
+    Task<PagedList<Shelf>> GetPagedShelvesAsync(FilteredParameters parameters);
     Task AddShelfAsync(Shelf shelf);
     Task DeleteShelfByIdAsync(int shelfId);
     Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries);

@@ -77,7 +77,7 @@ public class BookCopyController : ControllerBase
     }
     
     [HttpGet("{id:int:min(1)}/comments")]
-    public async Task<PagedViewModel<ReadCommentViewModel>> GetComments([FromRoute]int id, [FromQuery]ParametersBase parameters)
+    public async Task<PagedViewModel<ReadCommentViewModel>> GetComments([FromRoute]int id, [FromQuery]FilteredParameters parameters)
     {
         var comments = await _commentService.GetPagedCommentsAsync(
             parameters: parameters,

@@ -38,7 +38,7 @@ public class ShelfService : IShelfService
         return shelves;
     }
 
-    public async Task<PagedList<Shelf>> GetPagedShelvesAsync(ParametersBase parameters)
+    public async Task<PagedList<Shelf>> GetPagedShelvesAsync(FilteredParameters parameters)
     {
         var filter = GetFilterQuery(parameters.FilterParam);
         var order = GetOrderByQuery(parameters.OrderByParam);

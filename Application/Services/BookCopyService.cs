@@ -110,7 +110,7 @@ public class BookCopyService : IBookCopyService
         }
     }
     
-    public async Task<PagedList<BookCopy>> GetBookCopiesByShelfIdAsync(int shelfId, ParametersBase parameters)
+    public async Task<PagedList<BookCopy>> GetBookCopiesByShelfIdAsync(int shelfId, FilteredParameters parameters)
     {
         await _shelfRepository.GetFirstOrThrowAsync(sh => sh.Id == shelfId);
 

@@ -9,7 +9,7 @@ public interface ICommentService
 {
     Task CreateCommentAsync(Comment newComment);
     Task<PagedList<Comment>> GetPagedCommentsAsync(
-        ParametersBase parameters,
+        FilteredParameters parameters,
         Expression<Func<Comment, bool>>? additionalFilter = null);
     Task DeleteCommentAsync(int commentId, User actor);
     Task UpdateCommentAsync(Comment newComment);

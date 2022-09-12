@@ -35,7 +35,7 @@ public class CommentService : ICommentService
     }
     
     public async Task<PagedList<Comment>> GetPagedCommentsAsync(
-        ParametersBase parameters,
+        FilteredParameters parameters,
         Expression<Func<Comment, bool>>? additionalFilter = null)
     {
         var paramFilter = GetFilterQuery(parameters.FilterParam);
