@@ -76,8 +76,10 @@ public class BookController : ControllerBase
     }
 
     [HttpPost("filtered")]
-    public async Task GetFilteredBooks([FromBody]BookParameters parameters)
+    public async Task<PagedViewModel<ReadBookViewModel>> GetFilteredBooks([FromBody]BookParameters parameters)
     {
-        
+        var books = await _bookService.GetFilteredBooksAsync(parameters);
+        var viewModel = _pagedBookMapper.Map(books);
+        return viewModel;
     }
 }

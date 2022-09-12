@@ -11,5 +11,5 @@ public interface IBookService
     double GetBookRate(Book book);
     Task<double> GetBookRate(int bookId);
     Task AddCommentOnBookAsync(int bookId, Comment newComment);
-    Task<PagedList<ReadBookViewModel>> GetFilteredBooksAsync(BookParameters parameters);
+    Task<PagedList<Book>> GetFilteredBooksAsync(BookParameters parameters);
 }
