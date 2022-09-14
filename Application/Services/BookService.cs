@@ -12,15 +12,17 @@ public class BookService : IBookService
 {
     private readonly IRepository<Book> _bookRepository;
     private readonly ICommentService _commentService;
+    private readonly IFilterService _filterService;
 
     public BookService(
         IRepository<Book> bookRepository,
-        ICommentService commentService)
+        ICommentService commentService, 
+        IFilterService filterService)
     {
 
         _bookRepository = bookRepository;
-
         _commentService = commentService;
+        _filterService = filterService;
     }
     
     public async Task<Book> GetBookByViewModel(SearchBookViewModel viewModel)
@@ -46,9 +48,24 @@ public class BookService : IBookService
         await _commentService.CreateCommentAsync(newComment);
     }
 
-    public Task<PagedList<Book>> GetFilteredBooksAsync(BookParameters parameters)
+    public async Task<PagedList<Book>> GetFilteredBooksAsync(BookParameters parameters)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<IList<Book>> GetBooksByCategoryId(int categoryId)
+    {
+        var books = await _bookRepository.QueryAsync(
+            filter: book => book.BookCategories
+                .Select(bc => bc.CategoryId)
+                .Contains(categoryId),
+            include: query => query
+                .Include(b => b.Publisher)
+                .Include(b => b.BookWriters)
+                .ThenInclude(bw => bw.Writer)
+                .Include(b => b.BookCategories)
+                .ThenInclude(bc => bc.Category));
+        return books;
     }
 
     public double GetBookRate(Book book)

@@ -65,6 +65,7 @@ public class ShelfController : ControllerBase
     {
         var shelf = await _shelfService.GetShelfByIdAsync(id);
         var shelfComments = shelf.Comments.ToList();
+        //TODO: rewrite "new PagedList" to the ToPagedListAsync method
         var pagedComments = new PagedList<Comment>(shelfComments, shelfComments.Count);
         var shelfBookCopies = shelf.BookCopies.ToList();
         var pagedBookCopies = new PagedList<BookCopy>(shelfBookCopies, shelfBookCopies.Count);

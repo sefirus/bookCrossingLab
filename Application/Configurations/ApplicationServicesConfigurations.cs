@@ -16,5 +16,6 @@ public static class ApplicationServicesConfigurations
         services.AddTransient<IShelfService, ShelfService>();
         services.AddTransient<IBookCopyService, BookCopyService>();
         services.AddTransient<ICommentService, CommentService>();
+        services.AddTransient<IFilterService, FilterService>();
     }
 }

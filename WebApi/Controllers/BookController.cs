@@ -1,10 +1,12 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Mappers;
 using Core.Interfaces.Services;
+using Core.Pagination;
 using Core.Pagination.Parameters;
 using Core.ViewModels;
 using Core.ViewModels.BookViewModels;
 using Core.ViewModels.CommentViewModels;
+using Core.ViewModels.FilterViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +23,7 @@ public class BookController : ControllerBase
     private readonly ICommentService _commentService;
     private readonly IUserService _userService;
     private readonly IPagedVmMapper<Book, ReadBookViewModel> _pagedBookMapper;
+    private readonly IFilterService _filterService;
 
     public BookController(
         IBookService bookService, 
@@ -28,7 +31,8 @@ public class BookController : ControllerBase
         IVmMapper<CreateCommentViewModel, Comment> createCommentMapper,
         IPagedVmMapper<Comment, ReadCommentViewModel> pagedCommentMapper,
         ICommentService commentService, IUserService userService, 
-        IPagedVmMapper<Book, ReadBookViewModel> pagedBookMapper)
+        IPagedVmMapper<Book, ReadBookViewModel> pagedBookMapper, 
+        IFilterService filterService)
     {
         _bookService = bookService;
         _bookApiService = bookApiService;
@@ -37,6 +41,7 @@ public class BookController : ControllerBase
         _commentService = commentService;
         _userService = userService;
         _pagedBookMapper = pagedBookMapper;
+        _filterService = filterService;
     }
 
     [HttpGet]
@@ -81,5 +86,19 @@ public class BookController : ControllerBase
         var books = await _bookService.GetFilteredBooksAsync(parameters);
         var viewModel = _pagedBookMapper.Map(books);
         return viewModel;
+    }
+
+    [HttpGet("category/{id:int:min(1)}")]
+    public async Task<FilteredPagedBooksVm> GetBooksByCategory(int id)
+    {
+        var books = await _bookService.GetBooksByCategoryId(id);
+        var filters = _filterService.GetBookFilters(books);
+        var pagedBooks = books.ToPagedList();
+        var pagedVm = _pagedBookMapper.Map(pagedBooks);
+        return new FilteredPagedBooksVm()
+        {
+            Filters = filters,
+            Books = pagedVm
+        };
     }
 }
