@@ -25,7 +25,7 @@ public class BookService : IBookService
     
     public async Task<Book> GetBookByViewModel(SearchBookViewModel viewModel)
     {
-        var book = await _bookRepository.GetFirstOrDefaultAsync();
+        var book = await _bookRepository.GetFirstOrThrowAsync();
         return book;
     }
 

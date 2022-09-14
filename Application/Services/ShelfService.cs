@@ -8,8 +8,6 @@ using Core.Interfaces.Services;
 using Core.Pagination;
 using Core.Pagination.Parameters;
 using Core.ViewModels;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
 

@@ -40,7 +40,7 @@ public class Repository<T> : IRepository<T> where T : class
             return paged;
         }
 
-        private IQueryable<T> GetQuery(
+        public IQueryable<T> GetQuery(
             Expression<Func<T, bool>>? filter = null,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
