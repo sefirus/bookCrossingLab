@@ -2,7 +2,7 @@
 
 namespace Core.Pagination;
 
-public static class IQueryableExtensions
+public static class PaginationExtensions
 {
     public static async Task<PagedList<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageNumber = 1, int pageSize = 25)
     {
