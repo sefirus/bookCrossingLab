@@ -41,7 +41,7 @@ public class BookCopyService : IBookCopyService
         }        
         else
         {
-            baseBook = await _bookService.GetBookByViewModel(model);
+            baseBook = await _bookService.GetBookByGoogleApiIdAsync(model.GoogleApiId);
         }
         var newBookCopy = new BookCopy()
         {

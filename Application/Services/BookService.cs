@@ -3,8 +3,6 @@ using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.Pagination;
 using Core.Pagination.Parameters;
-using Core.ViewModels;
-using Core.ViewModels.BookViewModels;
 using F23.StringSimilarity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,22 +12,21 @@ public class BookService : IBookService
 {
     private readonly IRepository<Book> _bookRepository;
     private readonly ICommentService _commentService;
-    private readonly IFilterService _filterService;
 
     public BookService(
         IRepository<Book> bookRepository,
-        ICommentService commentService, 
-        IFilterService filterService)
+        ICommentService commentService)
     {
 
         _bookRepository = bookRepository;
         _commentService = commentService;
-        _filterService = filterService;
     }
     
-    public async Task<Book> GetBookByViewModel(SearchBookViewModel viewModel)
+    public async Task<Book> GetBookByGoogleApiIdAsync(string googleApiId)
     {
-        var book = await _bookRepository.GetFirstOrThrowAsync();
+        var book = await _bookRepository.GetFirstOrThrowAsync(
+            filter: book => book.GoogleApiId == googleApiId,
+            include: query => query.Include(b => b.Comments));
         return book;
     }
 
