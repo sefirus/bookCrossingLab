@@ -3,7 +3,9 @@ using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.Pagination;
 using Core.Pagination.Parameters;
+using Core.ViewModels;
 using Core.ViewModels.BookViewModels;
+using F23.StringSimilarity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
@@ -48,9 +50,65 @@ public class BookService : IBookService
         await _commentService.CreateCommentAsync(newComment);
     }
 
+    private bool PassesPublisherFilter(HashSet<int> publisherIds, Book book)
+    {
+        return publisherIds.Count == 0 || publisherIds.Contains(book.PublisherId);
+    }
+
+    private bool PassesWriterFilter(HashSet<int> writerIds, Book book)
+    {
+        return writerIds.Count == 0 
+               || book.BookWriters.Any(bw => writerIds.Contains(bw.WriterId));
+    }
+
+    private bool PassesCategoryFilter(HashSet<int> categoryIds, Book book)
+    {
+        return categoryIds.Count == 0 
+               || book.BookCategories.Any(bc => categoryIds.Contains(bc.CategoryId));
+    }
+
+    private bool PassesLanguageFilter(HashSet<string> languages, Book book)
+    {
+        return languages.Count == 0 || languages.Contains(book.Language);
+    }
+
+    private bool PassesSearch(string? query, Book book, JaroWinkler comparer)
+    {
+        var normalizedTitle = book.Title.ToUpper();
+        var normalizedDesc = book.Description.ToUpper();
+        return string.IsNullOrEmpty(query)
+               || normalizedTitle.Contains(query)
+               || query.Contains(normalizedTitle)
+               || normalizedDesc.Contains(query)
+               || query.Contains(normalizedDesc)
+               || comparer.Similarity(query, normalizedTitle) > 0.60
+               || comparer.Similarity(query, normalizedDesc) > 0.60;
+    }
+    
     public async Task<PagedList<Book>> GetFilteredBooksAsync(BookParameters parameters)
     {
-        throw new NotImplementedException();
+        var books = await _bookRepository.QueryAsync(
+            include: query => query
+                .Include(b => b.Publisher)
+                .Include(b => b.BookWriters)
+                .ThenInclude(bw => bw.Writer)
+                .Include(b => b.BookCategories)
+                .ThenInclude(bc => bc.Category));
+        var jw = new JaroWinkler();
+        var publisherIds = parameters.PublisherIds.ToHashSet();
+        var writerIds = parameters.WriterIds.ToHashSet();
+        var categoryIds = parameters.CategoryIds.ToHashSet();
+        var languages = parameters.Language.ToHashSet();
+        var normalizedQuery = parameters.FilterParam?.ToUpper();
+        var filteredBooks = books.Where(book => PassesCategoryFilter(categoryIds, book)
+                                    && PassesPublisherFilter(publisherIds, book)
+                                    && PassesWriterFilter(writerIds, book)
+                                    && PassesLanguageFilter(languages, book)
+                                    && PassesSearch(normalizedQuery, book, jw)
+                                    && book.PageCount >= parameters.MinPageCount 
+                                    && book.PageCount <= parameters.MaxPageCount).ToList();
+        var pagedBooks = filteredBooks.ToPagedList(parameters.PageNumber, parameters.PageSize);
+        return pagedBooks;
     }
 
     public async Task<IList<Book>> GetBooksByCategoryId(int categoryId)

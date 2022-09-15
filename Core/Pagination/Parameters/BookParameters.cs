@@ -7,5 +7,5 @@ public class BookParameters : FilteredParameters
     public IEnumerable<int> CategoryIds { get; set; } 
     public int MaxPageCount { get; set; }
     public int MinPageCount { get; set; }
-    public string Language { get; set; }
+    public IEnumerable<string> Language { get; set; }
 }
