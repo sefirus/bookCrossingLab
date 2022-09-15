@@ -58,7 +58,7 @@ public class BookApiService : IBookApiService
 
             searchBookViewModels.Add(new SearchBookViewModel()
             {
-                Id = volume.Id,
+                GoogleApiId = volume.Id,
                 ThumbnailLink = volume.VolumeInfo.ImageLinks?.Thumbnail,
                 Title = volume.VolumeInfo.Title,
                 Authors = volumeAuthors,
@@ -82,16 +82,11 @@ public class BookApiService : IBookApiService
         
         var searchResults = MapSearchBookViewModels(tempResponse);
 
-        return searchResults;
+        return searchResults.Take(10);
     }
 
-    private IEnumerable<SearchBookViewModel> MapBooks(List<Book> books)
+    private IEnumerable<SearchBookViewModel> MapBooks(IEnumerable<Book> books)
     {
-        if (books.Count == 0)
-        {
-            return Enumerable.Empty<SearchBookViewModel>();
-        }
-        
         var searchResults = new List<SearchBookViewModel>();
         foreach (var book in books)
         {
@@ -108,7 +103,8 @@ public class BookApiService : IBookApiService
 
             var vm = new SearchBookViewModel();
             vm.Title = book.Title;
-            vm.Id = book.Id.ToString();
+            vm.InternalId = book.Id;
+            vm.GoogleApiId = book.GoogleApiId;
             vm.Authors = bookAuthors;
             vm.SearchResultType = SearchResultType.Database;
             vm.ThumbnailLink = book.Pictures.FirstOrDefault()?.FullPath; 
@@ -118,37 +114,40 @@ public class BookApiService : IBookApiService
         return searchResults;
     }
 
-    private async Task<IEnumerable<SearchBookViewModel>> SearchInDbByTitleAsync(string request)
+    private bool ContainsAuthor(string request, Book book, JaroWinkler comparer)
     {
-        var jw = new JaroWinkler();
-        var query = (await _bookRepository.QueryAsync(
-                    include: prop =>
-                        prop.Include(b => b.BookWriters)
-                            .ThenInclude(ba => ba.Writer)
-                            .Include(b => b.Pictures))).AsEnumerable();
-        
-        var books = query.Where(b =>
-            jw.Similarity(request, b.Title) > 0.55 || jw.Similarity(request, b.Description) > 0.55).ToList();
-
-        var mappedBooks = MapBooks(books);
-        return mappedBooks;
+        var result = book.BookWriters
+            .Select(bw => bw.Writer)
+            .Any(w => comparer.Similarity(request, w.FullName) > 0.55);
+        return result;
     }
 
-    private async Task<IEnumerable<SearchBookViewModel>> SearchInDbByAuthorAsync(string request)
+    private bool ContainsTitle(string request, Book book, JaroWinkler comparer)
     {
-        var jw = new JaroWinkler();
-        var query = (await _bookRepository.QueryAsync(
-            include: prop =>
-                prop.Include(b => b.BookWriters)
-                    .ThenInclude(ba => ba.Writer)
-                    .Include(b => b.Pictures))).AsEnumerable();
-        
-        var books = query.Where(b =>
-            b.BookWriters.Select(bw => bw.Writer).Any(w => jw.Similarity(request, w.FullName) > 0.55))
-            .ToList();
+        var result = comparer.Similarity(request, book.Title) > 0.55 
+                     || comparer.Similarity(request, book.Description) > 0.55;
+        return result;
+    }
 
-        var mappedBooks = MapBooks(books);
-        return mappedBooks;
+    private async Task<(IEnumerable<SearchBookViewModel> FoundBooks, HashSet<string> googleApiIds)> SearchInDbAsync(string request)
+    {
+        var books = await _bookRepository.QueryAsync(include: prop =>
+            prop.Include(b => b.BookWriters)
+                .ThenInclude(ba => ba.Writer)
+                .Include(b => b.Pictures));
+        var jw = new JaroWinkler();
+        var foundIds = new HashSet<string>();
+        var filteredBooks = new List<Book>();
+        foreach (var book in books)
+        {
+            if (ContainsAuthor(request, book, jw) || ContainsTitle(request, book, jw))
+            {
+                filteredBooks.Add(book);
+                foundIds.Add(book.GoogleApiId);
+            }
+        }
+        var mappedBooks = MapBooks(filteredBooks);
+        return (mappedBooks, foundIds);
     }
 
     public async Task<IEnumerable<SearchBookViewModel>> SearchBookAsync(string request)
@@ -159,15 +158,21 @@ public class BookApiService : IBookApiService
         }
         var bookRequestUri = $"{_configuration["ApiAddresses:GoogleBooksUrl"]}?q=intitle:{request}";
         var authorRequestUri = $"{_configuration["ApiAddresses:GoogleBooksUrl"]}?q=inauthor:{request}";
+        var dbSearchResults = await SearchInDbAsync(request);
         var partialSearchResults = await Task.WhenAll(
-            SearchInDbByAuthorAsync(request),
             SearchInApiAsync(bookRequestUri),
             SearchInApiAsync(authorRequestUri));
-        var result = await SearchInDbByTitleAsync(request);
+        List<SearchBookViewModel> result = dbSearchResults.FoundBooks.ToList();
         _logger.LogInfo("Found books from api and database");
         foreach (var res in partialSearchResults)
         {
-            result = result.Concat(res);
+            foreach (var foundBook in res)
+            {
+                if (!dbSearchResults.googleApiIds.Contains(foundBook.GoogleApiId))
+                {
+                    result.Add(foundBook);
+                }
+            }
         }
         return result;
     }
@@ -349,6 +354,7 @@ public class BookApiService : IBookApiService
         }
         Book newBook = new Book();
         newBook.Title = volumeViewModel.VolumeInfo.Title;
+        newBook.GoogleApiId = volumeViewModel.Id;
         newBook.Description = volumeViewModel.VolumeInfo.Description;
         newBook.Language = volumeViewModel.VolumeInfo.Language;
         newBook.Pictures = MapPictures(volumeViewModel.VolumeInfo.ImageLinks!, newBook);
@@ -368,7 +374,7 @@ public class BookApiService : IBookApiService
             throw new InvalidOperationException();
         }
 
-        var bookUrl = $"{_configuration["ApiAddresses:GoogleBooksUrl"]}/{viewModel.Id}";
+        var bookUrl = $"{_configuration["ApiAddresses:GoogleBooksUrl"]}/{viewModel.GoogleApiId}";
         var client = _clientFactory.CreateClient();
         var response = await client.GetStringAsync(bookUrl);
         var volume = JsonConvert.DeserializeObject<VolumeViewModel>(response);
