@@ -40,6 +40,9 @@ public static class ApplicationMappersConfigurations
         services.AddTransient<IVmMapper<Book, ReadBookViewModel>, ReadBookMapper>();
 
         services.AddTransient<IVmMapper<Writer, ReadEmbeddedWriterVm>, ReadEmbeddedWriterVmMapper>();
+        services.AddTransient<IVmMapper<Writer, ReadWriterViewModel>, ReadWriterMapper>();
+        services.AddTransient<IVmMapper<CreateWriterViewModel, Writer>, CreateWriterMapper>();
+        services.AddTransient<IVmMapper<UpdateWriterViewModel, Writer>, UpdateWriterMapper>();
         
         services.AddTransient<IVmMapper<Publisher, ReadEmbeddedPublisherVm>, ReadEmbeddedPublisherVmMapper>();
     }

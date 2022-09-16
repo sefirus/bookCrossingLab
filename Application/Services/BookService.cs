@@ -73,13 +73,14 @@ public class BookService : IBookService
     {
         var normalizedTitle = book.Title.ToUpper();
         var normalizedDesc = book.Description.ToUpper();
-        return string.IsNullOrEmpty(query)
+        var result = string.IsNullOrEmpty(query)
                || normalizedTitle.Contains(query)
                || query.Contains(normalizedTitle)
                || normalizedDesc.Contains(query)
                || query.Contains(normalizedDesc)
                || comparer.Similarity(query, normalizedTitle) > 0.60
                || comparer.Similarity(query, normalizedDesc) > 0.60;
+        return result;
     }
     
     public async Task<PagedList<Book>> GetFilteredBooksAsync(BookParameters parameters)
