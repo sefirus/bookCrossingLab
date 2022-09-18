@@ -12,4 +12,5 @@ public interface IBookService
     Task AddCommentOnBookAsync(int bookId, Comment newComment);
     Task<PagedList<Book>> GetFilteredBooksAsync(BookParameters parameters);
     Task<IList<Book>> GetBooksByCategoryId(int categoryId);
+    Task<IList<Book>> GetBooksByWriterId(int writerId);
 }

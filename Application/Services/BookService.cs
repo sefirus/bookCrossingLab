@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using System.Linq.Expressions;
+using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.Pagination;
@@ -85,13 +86,7 @@ public class BookService : IBookService
     
     public async Task<PagedList<Book>> GetFilteredBooksAsync(BookParameters parameters)
     {
-        var books = await _bookRepository.QueryAsync(
-            include: query => query
-                .Include(b => b.Publisher)
-                .Include(b => b.BookWriters)
-                .ThenInclude(bw => bw.Writer)
-                .Include(b => b.BookCategories)
-                .ThenInclude(bc => bc.Category));
+        var books = await GetFullyIncludedBooksAsync();
         var jw = new JaroWinkler();
         var publisherIds = parameters.PublisherIds.ToHashSet();
         var writerIds = parameters.WriterIds.ToHashSet();
@@ -109,18 +104,31 @@ public class BookService : IBookService
         return pagedBooks;
     }
 
-    public async Task<IList<Book>> GetBooksByCategoryId(int categoryId)
+    private Task<IList<Book>> GetFullyIncludedBooksAsync(Expression<Func<Book, bool>>? filter = null)
     {
-        var books = await _bookRepository.QueryAsync(
-            filter: book => book.BookCategories
-                .Select(bc => bc.CategoryId)
-                .Contains(categoryId),
+        return _bookRepository.QueryAsync( 
+            filter: filter,
             include: query => query
                 .Include(b => b.Publisher)
                 .Include(b => b.BookWriters)
                 .ThenInclude(bw => bw.Writer)
                 .Include(b => b.BookCategories)
                 .ThenInclude(bc => bc.Category));
+    }
+    
+    public async Task<IList<Book>> GetBooksByCategoryId(int categoryId)
+    {
+        var books = await GetFullyIncludedBooksAsync(book => book.BookCategories
+                .Select(bc => bc.CategoryId)
+                .Contains(categoryId));
+        return books;
+    }
+
+    public async Task<IList<Book>> GetBooksByWriterId(int writerId)
+    {
+        var books = await GetFullyIncludedBooksAsync(book => book.BookWriters
+            .Select(bw => bw.WriterId)
+            .Contains(writerId));
         return books;
     }
 

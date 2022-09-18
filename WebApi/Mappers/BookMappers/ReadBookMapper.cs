@@ -33,10 +33,16 @@ public class ReadBookMapper : IVmMapper<Book, ReadBookViewModel>
             Isbn = source.Isbn,
             Language = source.Language,
             PageCount = source.PageCount,
-            Rate = _bookService.GetBookRate(source),
-            Writers = _writersMapper.Map(source.BookWriters.Select(bw => bw.Writer)),
-            Publisher = _publisherMapper.Map(source.Publisher),
+            Rate = _bookService.GetBookRate(source)
         };
+        if (source.BookWriters is not null)
+        {
+            vm.Writers = _writersMapper.Map(source.BookWriters.Select(bw => bw.Writer));
+        }
+        if (source.Publisher is not null)
+        {
+            vm.Publisher = _publisherMapper.Map(source.Publisher);
+        }
         return vm;
     }
 }

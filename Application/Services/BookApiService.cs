@@ -345,7 +345,7 @@ public class BookApiService : IBookApiService
         return isbn;
     }
 
-    private async Task<Book> MapVolumeToBook(VolumeViewModel volumeViewModel)
+    private async Task<Book> MapVolumeToBookAsync(VolumeViewModel volumeViewModel)
     {
         var missingProperties = FindMissingProperties(volumeViewModel);
         if (missingProperties.Any())
@@ -378,7 +378,7 @@ public class BookApiService : IBookApiService
         var client = _clientFactory.CreateClient();
         var response = await client.GetStringAsync(bookUrl);
         var volume = JsonConvert.DeserializeObject<VolumeViewModel>(response);
-        var newBook = await MapVolumeToBook(volume);
+        var newBook = await MapVolumeToBookAsync(volume);
         await _bookRepository.InsertAsync(newBook);
         await _bookRepository.SaveChangesAsync();
         return newBook;

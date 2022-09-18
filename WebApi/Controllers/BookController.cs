@@ -6,7 +6,6 @@ using Core.Pagination.Parameters;
 using Core.ViewModels;
 using Core.ViewModels.BookViewModels;
 using Core.ViewModels.CommentViewModels;
-using Core.ViewModels.FilterViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -88,10 +87,24 @@ public class BookController : ControllerBase
         return viewModel;
     }
 
-    [HttpGet("category/{id:int:min(1)}")]
-    public async Task<FilteredPagedBooksVm> GetBooksByCategory(int id)
+    [HttpGet("category/{categoryId:int:min(1)}")]
+    public async Task<FilteredPagedBooksVm> GetBooksByCategory(int categoryId)
     {
-        var books = await _bookService.GetBooksByCategoryId(id);
+        var books = await _bookService.GetBooksByCategoryId(categoryId);
+        var filters = _filterService.GetBookFilters(books);
+        var pagedBooks = books.ToPagedList();
+        var pagedVm = _pagedBookMapper.Map(pagedBooks);
+        return new FilteredPagedBooksVm()
+        {
+            Filters = filters,
+            Books = pagedVm
+        };
+    }
+    
+    [HttpGet("category/{writerId:int:min(1)}")]
+    public async Task<FilteredPagedBooksVm> GetBooksByWriter(int writerId)
+    {
+        var books = await _bookService.GetBooksByWriterId(writerId);
         var filters = _filterService.GetBookFilters(books);
         var pagedBooks = books.ToPagedList();
         var pagedVm = _pagedBookMapper.Map(pagedBooks);
