@@ -44,6 +44,9 @@ public static class ApplicationMappersConfigurations
         services.AddTransient<IVmMapper<CreateWriterViewModel, Writer>, CreateWriterMapper>();
         services.AddTransient<IVmMapper<UpdateWriterViewModel, Writer>, UpdateWriterMapper>();
         
-        services.AddTransient<IVmMapper<Publisher, ReadEmbeddedPublisherVm>, ReadEmbeddedPublisherVmMapper>();
+        services.AddTransient<IVmMapper<Publisher, ReadEmbeddedPublisherVm>, ReadEmbeddedPublisherMapper>();
+        services.AddTransient<IVmMapper<Publisher, ReadPublisherViewModel>, ReadPublisherMapper>();
+        services.AddTransient<IVmMapper<CreatePublisherViewModel, Publisher>, CreatePublisherMapper>();
+        services.AddTransient<IVmMapper<UpdatePublisherViewModel, Publisher>, UpdatePublisherMapper>();
     }
 }

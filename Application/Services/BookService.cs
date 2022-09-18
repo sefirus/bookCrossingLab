@@ -131,6 +131,12 @@ public class BookService : IBookService
             .Contains(writerId));
         return books;
     }
+    
+    public async Task<IList<Book>> GetBooksByPublisherId(int publisherId)
+    {
+        var books = await GetFullyIncludedBooksAsync(book => book.PublisherId == publisherId);
+        return books;
+    }
 
     public double GetBookRate(Book book)
     {

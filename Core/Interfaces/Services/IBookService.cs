@@ -13,4 +13,5 @@ public interface IBookService
     Task<PagedList<Book>> GetFilteredBooksAsync(BookParameters parameters);
     Task<IList<Book>> GetBooksByCategoryId(int categoryId);
     Task<IList<Book>> GetBooksByWriterId(int writerId);
+    Task<IList<Book>> GetBooksByPublisherId(int publisherId);
 }

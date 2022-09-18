@@ -4,7 +4,7 @@ using Core.ViewModels.PublisherViewModels;
 
 namespace WebApi.Mappers.PublisherMappers;
 
-public class ReadEmbeddedPublisherVmMapper : IVmMapper<Publisher, ReadEmbeddedPublisherVm>
+public class ReadEmbeddedPublisherMapper : IVmMapper<Publisher, ReadEmbeddedPublisherVm>
 {
     public ReadEmbeddedPublisherVm Map(Publisher source)
     {

@@ -101,10 +101,24 @@ public class BookController : ControllerBase
         };
     }
     
-    [HttpGet("category/{writerId:int:min(1)}")]
+    [HttpGet("writer/{writerId:int:min(1)}")]
     public async Task<FilteredPagedBooksVm> GetBooksByWriter(int writerId)
     {
         var books = await _bookService.GetBooksByWriterId(writerId);
+        var filters = _filterService.GetBookFilters(books);
+        var pagedBooks = books.ToPagedList();
+        var pagedVm = _pagedBookMapper.Map(pagedBooks);
+        return new FilteredPagedBooksVm()
+        {
+            Filters = filters,
+            Books = pagedVm
+        };
+    }
+    
+    [HttpGet("publisher/{writerId:int:min(1)}")]
+    public async Task<FilteredPagedBooksVm> GetBooksByPublisher(int writerId)
+    {
+        var books = await _bookService.GetBooksByPublisherId(writerId);
         var filters = _filterService.GetBookFilters(books);
         var pagedBooks = books.ToPagedList();
         var pagedVm = _pagedBookMapper.Map(pagedBooks);
