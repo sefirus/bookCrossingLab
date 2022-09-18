@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Application.Configurations;
+using Azure.Storage.Blobs;
 using BookCrossingBackEnd.Configuration;
 using BookCrossingBackEnd.Middleware;
 using DataAccess.Context;
@@ -29,6 +30,8 @@ builder.Services.AddApplicationMappers();
 
 builder.Services.AddDbContext<BookCrossingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped(_ => new BlobServiceClient(builder.Configuration.GetConnectionString("BlobConnection")));
+
 
 builder.Services
     .AddControllers(options =>
