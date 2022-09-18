@@ -19,5 +19,6 @@ public static class ApplicationServicesConfigurations
         services.AddTransient<IFilterService, FilterService>();
         services.AddTransient<IWriterService, WriterService>();
         services.AddTransient<IPublisherService, PublisherService>();
+        services.AddTransient<IImageService, ImageService>();
     }
 }
