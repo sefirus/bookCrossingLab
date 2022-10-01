@@ -46,4 +46,12 @@ public class ImageRepository : IImageRepository
         var blobClient = blobContainer.GetBlobClient($"{folder}/{imageName}");
         await blobClient.DeleteAsync();
     }
+
+    public async Task DeleteAsync(string fullPath)
+    {
+        var blobContainer = _blobServiceClient.GetBlobContainerClient(_configuration["Azure:ContainerName"]);
+        var filePath = fullPath.Split(_configuration["Azure:ContainerName"]).Last();
+        var blobClient = blobContainer.GetBlobClient(filePath);
+        await blobClient.DeleteAsync();
+    }
 }

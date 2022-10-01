@@ -1,5 +1,7 @@
-﻿using Core.Interfaces.Services;
+﻿using Core.Enums;
+using Core.Interfaces.Services;
 using Core.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,14 +22,25 @@ public class ImageController : ControllerBase
         _userService = userService;
     }
 
-    [HttpPost]
-    public async Task<ImageLinkVm> UploadImage(IFormFile file)
+    [Authorize]
+    [HttpPost("{editingEntity}")]
+    public async Task<ImageLinkVm> UploadImage(IFormFile file, [FromRoute]string editingEntity)
     {
-        //var author = _userService.GetCurrentUserAsync(HttpContext);
-        var link = await _imageService.UploadImageAsync(file, 123);
+        var author = await _userService.GetCurrentUserAsync(HttpContext);
+        var operationType = editingEntity.GetPictureOperationType();
+        var link = await _imageService.UploadImageAsync(file, author.Id, operationType);
         return new ImageLinkVm()
         {
             ImageUrl = link
         };
+    }
+
+    [Authorize]
+    [HttpDelete("{editingEntity}")]
+    public async Task DiscardEditing([FromRoute] string editingEntity)
+    {
+        var author = await _userService.GetCurrentUserAsync(HttpContext);
+        var operationType = editingEntity.GetPictureOperationType();
+        await _imageService.DiscardCachedImagesAsync(author.Id, operationType);
     }
 }

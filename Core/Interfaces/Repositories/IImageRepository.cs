@@ -6,4 +6,5 @@ public interface IImageRepository
 {
     Task<string> UploadFromIFormFile(IFormFile file, string folder, string fileName = "");
     Task DeleteAsync(string imageName, string folder);
+    Task DeleteAsync(string fullPath);
 }

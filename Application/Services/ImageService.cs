@@ -1,4 +1,5 @@
 ﻿using Azure;
+using Core.Enums;
 using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
@@ -82,19 +83,20 @@ public class ImageService : IImageService
     //      return body;
     // }
 
-    public async Task DiscardCachedImagesAsync(int authorId)
+    public async Task DiscardCachedImagesAsync(int authorId, PictureOperationType operationType)
     {
-        var cachedList = _memoryCache.Get<List<string>>(authorId);
+        var cacheKey = (authorId, pictureOperationType: operationType);
+        var cachedList = _memoryCache.Get<List<string>>(cacheKey);
         if (cachedList is null || cachedList.Count == 0)
         {
             return;
         }
 
-        foreach (var fileName in cachedList)
+        foreach (var fullPath in cachedList)
         {
             try
             {
-                await _imageRepository.DeleteAsync(fileName, "articles");
+                await _imageRepository.DeleteAsync(fullPath);
             }
             catch (RequestFailedException)
             {
@@ -145,23 +147,23 @@ public class ImageService : IImageService
         }
     }
 
-    public async Task<string> UploadImageAsync(IFormFile file, int authorId)
+    public async Task<string> UploadImageAsync(IFormFile file, int authorId, PictureOperationType operationType)
     {
         EnsureFileFormat(file);
         string link;
         try
         {
-             link = await _imageRepository.UploadFromIFormFile(file, "articles");
+             link = await _imageRepository.UploadFromIFormFile(file, operationType.GetFolderName());
         }
         catch (RequestFailedException)
         {
             _loggerManager.LogWarn("Error while uploading file to the blob");
             throw new BadRequestException("Error while uploading file to the blob");
         }
-        var fileName = link.Split('/').Last();
-        var currentList = _memoryCache.Get<List<string>>(authorId) ?? new List<string>(); 
-        currentList.Add(fileName);
-        _memoryCache.Set(authorId, currentList,TimeSpan.FromMinutes(10));
+        var cacheKey = (authorId, pictureOperationType: operationType);
+        var currentList = _memoryCache.Get<List<string>>(cacheKey) ?? new List<string>(); 
+        currentList.Add(link);
+        _memoryCache.Set(cacheKey, currentList,TimeSpan.FromMinutes(10));
         return link;
     }
 }
