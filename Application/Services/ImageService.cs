@@ -1,4 +1,5 @@
 ﻿using Azure;
+using Core.Entities;
 using Core.Enums;
 using Core.Exceptions;
 using Core.Interfaces.Repositories;
@@ -28,44 +29,22 @@ public class ImageService : IImageService
         _loggerManager = loggerManager;
     }
     
-    public async Task ClearOutdatedImagesAsync(string newBody, string oldBody)
-    {
-        // if (oldBody == newBody)
-        // {
-        //     return;
-        // }
-        // var tagSplitter = new TagSplitter(oldBody);
-        // while (tagSplitter.TryGetNextTag(out var tag))
-        // {
-        //     ParseImgTag(tag, out _, out var possibleFileName, out _);
-        //     var fileName = possibleFileName.ToString();
-        //     if (!string.IsNullOrEmpty(fileName) && !newBody.Contains(fileName))
-        //     {
-        //         try
-        //         {
-        //             await _imageRepository.DeleteAsync(possibleFileName.ToString(), "articles");
-        //         }
-        //         catch (RequestFailedException)
-        //         {
-        //             _loggerManager.LogWarn("Error while deleting file from the blob");
-        //             throw new BadRequestException("Error while deleting file from the blob");
-        //         }
-        //     }
-        // }
-    }
-    
-    // public async Task<string> DeleteImagesAsync(string body)
+    // public async Task ClearOutdatedImagesAsync(string newBody, string oldBody)
     // {
-    //     var tagSplitter = new TagSplitter(body);
-    //     while (tagSplitter.TryGetNextTag(out var tag, out var startIndex, out var length))
+    //     if (oldBody == newBody)
     //     {
-    //         ParseImgTag(tag, out var link, out var fileName, out var isOuterLink);
-    //     
-    //         if (!isOuterLink)
+    //         return;
+    //     }
+    //     var tagSplitter = new TagSplitter(oldBody);
+    //     while (tagSplitter.TryGetNextTag(out var tag))
+    //     {
+    //         ParseImgTag(tag, out _, out var possibleFileName, out _);
+    //         var fileName = possibleFileName.ToString();
+    //         if (!string.IsNullOrEmpty(fileName) && !newBody.Contains(fileName))
     //         {
     //             try
     //             {
-    //                 await _imageRepository.DeleteAsync(fileName.ToString(), folder: "articles");
+    //                 await _imageRepository.DeleteAsync(possibleFileName.ToString(), "articles");
     //             }
     //             catch (RequestFailedException)
     //             {
@@ -73,15 +52,29 @@ public class ImageService : IImageService
     //                 throw new BadRequestException("Error while deleting file from the blob");
     //             }
     //         }
-    //     
-    //         body = body.Remove(
-    //             startIndex: startIndex,
-    //             count: length);
-    //         tagSplitter.RemoveTag(body);
     //     }
-    //     
-    //      return body;
     // }
+
+    public async Task DeleteImagesAsync(List<Picture> pictures)
+    {
+        await DeleteImagesAsync(pictures.Select(p => p.FullPath));
+    }
+
+    public async Task DeleteImagesAsync(IEnumerable<string> imageLinks)
+    {
+        foreach (var imageLink in imageLinks)
+        {
+            try
+            {
+                await _imageRepository.DeleteAsync(imageLink);
+            }
+            catch (RequestFailedException)
+            {
+                _loggerManager.LogWarn("Error while deleting file from the blob");
+                throw new BadRequestException("Error while deleting file from the blob");
+            }
+        }
+    }
 
     public async Task DiscardCachedImagesAsync(int authorId, PictureOperationType operationType)
     {
@@ -107,21 +100,29 @@ public class ImageService : IImageService
         _memoryCache.Remove(authorId);
     }
 
-    public async Task ClearUnusedImagesAsync(string body, int authorId)
+
+    public async Task ClearUnusedImagesAsync(List<Picture> pictures, int authorId, PictureOperationType operationType)
     {
-        var cachedList = _memoryCache.Get<List<string>>(authorId);
+        var imageLinks = pictures.Select(p => p.FullPath).ToList();
+        await ClearUnusedImagesAsync(imageLinks, authorId, operationType);
+    }
+    
+    public async Task ClearUnusedImagesAsync(List<string> imageLinks, int authorId, PictureOperationType operationType)
+    {
+        var cacheKey = (authorId, pictureOperationType: operationType);
+        var cachedList = _memoryCache.Get<List<string>>(cacheKey);
         if (cachedList is null || cachedList.Count == 0)
         {
             return;
         }
 
-        foreach (var fileName in cachedList)
+        foreach (var imageLink in cachedList)
         {
-            if (!body.Contains(fileName))
+            if (!imageLinks.Contains(imageLink))
             {
                 try
                 {
-                    await _imageRepository.DeleteAsync(fileName, "articles");
+                    await _imageRepository.DeleteAsync(imageLink);
                 }
                 catch (RequestFailedException)
                 {
