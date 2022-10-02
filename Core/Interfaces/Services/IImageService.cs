@@ -12,4 +12,6 @@ public interface IImageService
     Task ClearUnusedImagesAsync(List<string> imageLinks, int authorId, PictureOperationType operationType);
     Task DeleteImagesAsync(List<Picture> pictures);
     Task DeleteImagesAsync(IEnumerable<string> imageLinks);
+    Task ClearOutdatedImagesAsync(List<Picture> oldPictures, List<Picture> newPictures);
+    Task ClearOutdatedImagesAsync(List<string> oldPictureLinks, List<string> newPictureLinks);
 }

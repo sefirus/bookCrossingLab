@@ -28,32 +28,37 @@ public class ImageService : IImageService
         _memoryCache = memoryCache;
         _loggerManager = loggerManager;
     }
+
+    public async Task ClearOutdatedImagesAsync(List<Picture> oldPictures, List<Picture> newPictures)
+    {
+        var oldPicturesLinks = oldPictures.Select(p => p.FullPath).ToList();
+        var newPicturesLinks = newPictures.Select(p => p.FullPath).ToList();
+        await ClearOutdatedImagesAsync(oldPicturesLinks, newPicturesLinks);
+    }
     
-    // public async Task ClearOutdatedImagesAsync(string newBody, string oldBody)
-    // {
-    //     if (oldBody == newBody)
-    //     {
-    //         return;
-    //     }
-    //     var tagSplitter = new TagSplitter(oldBody);
-    //     while (tagSplitter.TryGetNextTag(out var tag))
-    //     {
-    //         ParseImgTag(tag, out _, out var possibleFileName, out _);
-    //         var fileName = possibleFileName.ToString();
-    //         if (!string.IsNullOrEmpty(fileName) && !newBody.Contains(fileName))
-    //         {
-    //             try
-    //             {
-    //                 await _imageRepository.DeleteAsync(possibleFileName.ToString(), "articles");
-    //             }
-    //             catch (RequestFailedException)
-    //             {
-    //                 _loggerManager.LogWarn("Error while deleting file from the blob");
-    //                 throw new BadRequestException("Error while deleting file from the blob");
-    //             }
-    //         }
-    //     }
-    // }
+    public async Task ClearOutdatedImagesAsync(List<string> oldPictureLinks, List<string> newPictureLinks)
+    {
+        // if (oldBody == newBody)
+        // {
+        //     return;
+        // }
+        foreach (var oldPicture in oldPictureLinks)
+        {
+            if (!newPictureLinks.Contains(oldPicture))
+            {
+                try
+                {
+                    await _imageRepository.DeleteAsync(oldPicture);
+                }
+                catch (RequestFailedException)
+                {
+                    _loggerManager.LogWarn("Error while deleting file from the blob");
+                    throw new BadRequestException("Error while deleting file from the blob");
+                }
+                
+            }
+        }
+    }
 
     public async Task DeleteImagesAsync(List<Picture> pictures)
     {
