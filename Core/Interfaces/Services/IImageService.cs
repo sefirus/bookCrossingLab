@@ -8,10 +8,10 @@ public interface IImageService
 {
     Task<string> UploadImageAsync(IFormFile file, int authorId, PictureOperationType operationType);
     Task DiscardCachedImagesAsync(int authorId, PictureOperationType pictureOperationType);
-    Task ClearUnusedImagesAsync(List<Picture> pictures, int authorId, PictureOperationType operationType);
-    Task ClearUnusedImagesAsync(List<string> imageLinks, int authorId, PictureOperationType operationType);
-    Task DeleteImagesAsync(List<Picture> pictures);
+    Task ClearUnusedImagesAsync(IList<Picture> pictures, int authorId, PictureOperationType operationType);
+    Task ClearUnusedImagesAsync(IList<string> imageLinks, int authorId, PictureOperationType operationType);
+    Task DeleteImagesAsync(IList<Picture> pictures);
     Task DeleteImagesAsync(IEnumerable<string> imageLinks);
-    Task ClearOutdatedImagesAsync(List<Picture> oldPictures, List<Picture> newPictures);
-    Task ClearOutdatedImagesAsync(List<string> oldPictureLinks, List<string> newPictureLinks);
+    Task ClearOutdatedImagesAsync(IList<Picture> oldPictures, IList<Picture> newPictures);
+    Task ClearOutdatedImagesAsync(IList<string> oldPictureLinks, IList<string> newPictureLinks);
 }

@@ -5,6 +5,6 @@ namespace Core.Interfaces.Repositories;
 public interface IImageRepository
 {
     Task<string> UploadFromIFormFile(IFormFile file, string folder, string fileName = "");
-    Task DeleteAsync(string imageName, string folder);
-    Task DeleteAsync(string fullPath);
+    Task DeleteFromBlobAsync(string fullPath);
+    Task DeleteFromBlobAndDbAsync(string fullPath);
 }

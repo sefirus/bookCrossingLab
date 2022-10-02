@@ -11,6 +11,7 @@ namespace WebApi.Controllers;
 public class PublisherController : ControllerBase
 {
     private readonly IPublisherService _publisherService;
+    private readonly IUserService _userService;
     private readonly IVmMapper<Publisher, ReadPublisherViewModel> _readMapper;
     private readonly IVmMapper<CreatePublisherViewModel, Publisher> _createMapper;
     private readonly IVmMapper<UpdatePublisherViewModel, Publisher> _updateMapper;
@@ -19,12 +20,14 @@ public class PublisherController : ControllerBase
         IPublisherService publisherService, 
         IVmMapper<Publisher, ReadPublisherViewModel> readMapper, 
         IVmMapper<CreatePublisherViewModel, Publisher> createMapper, 
-        IVmMapper<UpdatePublisherViewModel, Publisher> updateMapper)
+        IVmMapper<UpdatePublisherViewModel, Publisher> updateMapper, 
+        IUserService userService)
     {
         _publisherService = publisherService;
         _readMapper = readMapper;
         _createMapper = createMapper;
         _updateMapper = updateMapper;
+        _userService = userService;
     }
     
     [HttpGet("{id:int:min(1)}")]
@@ -39,14 +42,16 @@ public class PublisherController : ControllerBase
     public async Task AddPublisher([FromBody]CreatePublisherViewModel viewModel)
     {
         var publisher = _createMapper.Map(viewModel);
-        await _publisherService.AddPublisherAsync(publisher);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        await _publisherService.AddPublisherAsync(publisher, user.Id, viewModel.ImageLinks);
     }
 
     [HttpPut]
     public async Task UpdatePublisher([FromBody]UpdatePublisherViewModel viewModel)
     {
         var publisher = _updateMapper.Map(viewModel);
-        await _publisherService.UpdatePublisherAsync(publisher);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        await _publisherService.UpdatePublisherAsync(publisher, user.Id, viewModel.ImageLinks);
     }
 
     [HttpDelete("{id:int:min(1)}")]

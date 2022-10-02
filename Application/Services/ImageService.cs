@@ -29,38 +29,33 @@ public class ImageService : IImageService
         _loggerManager = loggerManager;
     }
 
-    public async Task ClearOutdatedImagesAsync(List<Picture> oldPictures, List<Picture> newPictures)
+    public async Task ClearOutdatedImagesAsync(IList<Picture> oldPictures, IList<Picture> newPictures)
     {
         var oldPicturesLinks = oldPictures.Select(p => p.FullPath).ToList();
         var newPicturesLinks = newPictures.Select(p => p.FullPath).ToList();
         await ClearOutdatedImagesAsync(oldPicturesLinks, newPicturesLinks);
     }
     
-    public async Task ClearOutdatedImagesAsync(List<string> oldPictureLinks, List<string> newPictureLinks)
+    public async Task ClearOutdatedImagesAsync(IList<string> oldPictureLinks, IList<string> newPictureLinks)
     {
-        // if (oldBody == newBody)
-        // {
-        //     return;
-        // }
         foreach (var oldPicture in oldPictureLinks)
         {
             if (!newPictureLinks.Contains(oldPicture))
             {
                 try
                 {
-                    await _imageRepository.DeleteAsync(oldPicture);
+                    await _imageRepository.DeleteFromBlobAndDbAsync(oldPicture);
                 }
                 catch (RequestFailedException)
                 {
                     _loggerManager.LogWarn("Error while deleting file from the blob");
                     throw new BadRequestException("Error while deleting file from the blob");
                 }
-                
             }
         }
     }
 
-    public async Task DeleteImagesAsync(List<Picture> pictures)
+    public async Task DeleteImagesAsync(IList<Picture> pictures)
     {
         await DeleteImagesAsync(pictures.Select(p => p.FullPath));
     }
@@ -71,7 +66,7 @@ public class ImageService : IImageService
         {
             try
             {
-                await _imageRepository.DeleteAsync(imageLink);
+                await _imageRepository.DeleteFromBlobAndDbAsync(imageLink);
             }
             catch (RequestFailedException)
             {
@@ -94,7 +89,7 @@ public class ImageService : IImageService
         {
             try
             {
-                await _imageRepository.DeleteAsync(fullPath);
+                await _imageRepository.DeleteFromBlobAsync(fullPath);
             }
             catch (RequestFailedException)
             {
@@ -102,17 +97,16 @@ public class ImageService : IImageService
                 throw new BadRequestException("Error while deleting file from the blob");
             }
         }
-        _memoryCache.Remove(authorId);
+        _memoryCache.Remove(cacheKey);
     }
 
-
-    public async Task ClearUnusedImagesAsync(List<Picture> pictures, int authorId, PictureOperationType operationType)
+    public async Task ClearUnusedImagesAsync(IList<Picture> pictures, int authorId, PictureOperationType operationType)
     {
         var imageLinks = pictures.Select(p => p.FullPath).ToList();
         await ClearUnusedImagesAsync(imageLinks, authorId, operationType);
     }
     
-    public async Task ClearUnusedImagesAsync(List<string> imageLinks, int authorId, PictureOperationType operationType)
+    public async Task ClearUnusedImagesAsync(IList<string> imageLinks, int authorId, PictureOperationType operationType)
     {
         var cacheKey = (authorId, pictureOperationType: operationType);
         var cachedList = _memoryCache.Get<List<string>>(cacheKey);
@@ -127,7 +121,7 @@ public class ImageService : IImageService
             {
                 try
                 {
-                    await _imageRepository.DeleteAsync(imageLink);
+                    await _imageRepository.DeleteFromBlobAsync(imageLink);
                 }
                 catch (RequestFailedException)
                 {
@@ -136,7 +130,7 @@ public class ImageService : IImageService
                 }
             }
         }
-        _memoryCache.Remove(authorId);
+        _memoryCache.Remove(cacheKey);
     }
 
     private void EnsureFileFormat(IFormFile file)
