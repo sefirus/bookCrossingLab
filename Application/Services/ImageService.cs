@@ -166,4 +166,33 @@ public class ImageService : IImageService
         _memoryCache.Set(cacheKey, currentList,TimeSpan.FromMinutes(10));
         return link;
     }
+    
+    public IList<Picture> MapPictures(IEnumerable<string> imageLinks, List<Picture>? existing = null)
+    {
+        IList<Picture> pictureList = new List<Picture>();
+        var possibleExistingImageLinks = new List<string>();
+        if (existing is not null)
+        {
+            possibleExistingImageLinks = existing.Select(p => p.FullPath).ToList();
+        }
+        foreach (var imageLink in imageLinks)
+        {
+            if (possibleExistingImageLinks.Contains(imageLink))
+            {
+                var picture = existing.First(picture => picture.FullPath == imageLink);
+                pictureList.Add(picture);
+            }
+            else
+            {
+                var newPicture = new Picture()
+                {
+                    //Publisher = publisher,
+                    FullPath = imageLink
+                };
+                pictureList.Add(newPicture);   
+            }
+        }
+
+        return pictureList;
+    }
 }

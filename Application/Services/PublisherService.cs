@@ -22,39 +22,9 @@ public class PublisherService : IPublisherService
         _pictureRepository = pictureRepository;
     }
 
-    private IList<Picture> MapPictures(IEnumerable<string> imageLinks, Publisher publisher, List<Picture>? existing = null)
-    {
-        //var existingPictures = await _pictureRepository.QueryAsync(picture => picture.PublisherId == n)
-        IList<Picture> pictureList = new List<Picture>();
-        var possibleExistingImageLinks = new List<string>();
-        if (existing is not null)
-        {
-            possibleExistingImageLinks = existing.Select(p => p.FullPath).ToList();
-        }
-        foreach (var imageLink in imageLinks)
-        {
-            if (possibleExistingImageLinks.Contains(imageLink))
-            {
-                var picture = existing.First(picture => picture.FullPath == imageLink);
-                pictureList.Add(picture);
-            }
-            else
-            {
-                var newPicture = new Picture()
-                {
-                    Publisher = publisher,
-                    FullPath = imageLink
-                };
-                pictureList.Add(newPicture);   
-            }
-        }
-
-        return pictureList;
-    }
-    
     public async Task AddPublisherAsync(Publisher newPublisher, int userId, IEnumerable<string> imageLinks)
     {
-        var pictureList = MapPictures(imageLinks, newPublisher);
+        var pictureList = _imageService.MapPictures(imageLinks);
         await _imageService.ClearUnusedImagesAsync(pictureList, userId, PictureOperationType.EditingPublisher);
         newPublisher.Pictures = pictureList;
         await _publisherRepository.InsertAsync(newPublisher);
@@ -69,7 +39,7 @@ public class PublisherService : IPublisherService
                 include: query => query.Include(publisher => publisher.Pictures));
         oldPublisher.Name = newPublisher.Name;
         oldPublisher.Description = newPublisher.Description;
-        var pictureList = MapPictures(imageLinks, newPublisher, oldPublisher.Pictures.ToList());
+        var pictureList = _imageService.MapPictures(imageLinks, oldPublisher.Pictures.ToList());
         await _imageService.ClearUnusedImagesAsync(pictureList, userId, PictureOperationType.EditingPublisher);
         await _imageService.ClearOutdatedImagesAsync(oldPublisher.Pictures.ToList(), pictureList);
         oldPublisher.Pictures = pictureList;
