@@ -60,9 +60,10 @@ public class AuthService : IAuthService
             .ToString(CultureInfo.CurrentCulture);
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, user.Role.Name),
-            new(ClaimTypes.Expiration, expirationClaimValue)
+            new("EmailAddress", user.Email),
+            new("Role", user.Role.Name),
+            new("Expiration", expirationClaimValue),
+            new("Id", user.Id.ToString())
         };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
             _configuration.GetSection("Authorization:Token").Value));

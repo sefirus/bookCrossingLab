@@ -87,6 +87,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 });
 
+builder.Services.AddCors(o => o.AddPolicy("MyPolicy", corsPolicyBuilder =>
+{
+    corsPolicyBuilder.WithOrigins("https://localhost")
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+}));
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -99,6 +107,7 @@ app.UseCors(SystemServicesConfiguration.AllowedOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("MyPolicy");
 
 app.MapControllers();
 app.UseMiddleware<ExceptionMiddleware>();
