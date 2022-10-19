@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Enums;
 using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
@@ -10,10 +11,14 @@ namespace Application.Services;
 public class UserService : IUserService
 {
     private readonly IRepository<User> _userRepository;
+    private readonly IRepository<Role> _roleRepository;
 
-    public UserService(IRepository<User> userRepository)
+    public UserService(
+        IRepository<User> userRepository,
+        IRepository<Role> roleRepository)
     {
         _userRepository = userRepository;
+        _roleRepository = roleRepository;
     }
     
     public async Task CreateUser(User newUser, string password)
@@ -27,7 +32,11 @@ public class UserService : IUserService
         HashHelper.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
         newUser.PasswordHash = passwordHash;
         newUser.PasswordSalt = passwordSalt;
-
+        var regularUserRole = await _roleRepository
+            .GetFirstOrThrowAsync(role => role.Name == ApplicationRoles.RegularUser);
+        newUser.RoleId = regularUserRole.Id;
+        newUser.Role = regularUserRole;
+        
         await _userRepository.InsertAsync(newUser);
         await _userRepository.SaveChangesAsync();
     }
