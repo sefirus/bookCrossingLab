@@ -8,7 +8,8 @@ public enum PictureOperationType
     EditingBook, 
     EditingBookCopy,
     EditingWriter,
-    EditingPublisher
+    EditingPublisher,
+    EditingUser
 }
 
 public static class PictureOperationTypeExtensions
@@ -28,6 +29,8 @@ public static class PictureOperationTypeExtensions
                 return PictureOperationType.EditingWriter;
             case "publisher" or "editingpublisher":
                 return PictureOperationType.EditingPublisher;
+            case "user" or "editinguser":
+                return PictureOperationType.EditingUser;
         }
         throw new BadRequestException("Wrong editing entity!");
     }
@@ -41,6 +44,7 @@ public static class PictureOperationTypeExtensions
             case PictureOperationType.EditingPublisher: return "publishers";
             case PictureOperationType.EditingShelf: return "shelves";
             case PictureOperationType.EditingWriter: return "writers";
+            case PictureOperationType.EditingUser: return "users";
         }
 
         throw new BadRequestException("Wrong folder to interact with!");

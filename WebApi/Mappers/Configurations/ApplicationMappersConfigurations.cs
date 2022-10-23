@@ -53,5 +53,6 @@ public static class ApplicationMappersConfigurations
 
         services.AddTransient<IVmMapper<CreateUserViewModel, User>, CreateUserMapper>();
         services.AddTransient<IVmMapper<User, ReadUserViewModel>, ReadUserMapper>();
+        services.AddTransient<IVmMapper<UpdateUserViewModel, User>, UpdateUserMapper>();
     }
 }

@@ -186,7 +186,6 @@ public class ImageService : IImageService
             {
                 var newPicture = new Picture()
                 {
-                    //Publisher = publisher,
                     FullPath = imageLink
                 };
                 pictureList.Add(newPicture);   

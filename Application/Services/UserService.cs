@@ -12,13 +12,16 @@ public class UserService : IUserService
 {
     private readonly IRepository<User> _userRepository;
     private readonly IRepository<Role> _roleRepository;
+    private readonly IImageService _imageService;
 
     public UserService(
         IRepository<User> userRepository,
-        IRepository<Role> roleRepository)
+        IRepository<Role> roleRepository, 
+        IImageService imageService)
     {
         _userRepository = userRepository;
         _roleRepository = roleRepository;
+        _imageService = imageService;
     }
     
     public async Task CreateUser(User newUser, string password)
@@ -43,7 +46,7 @@ public class UserService : IUserService
     
     public async Task<User> GetCurrentUserAsync(HttpContext context)
     {
-        var claim = context.User.Claims.FirstOrDefault(claim => claim.Type.Contains("emailaddress"));
+        var claim = context.User.Claims.FirstOrDefault(claim => claim.Type.Contains("EmailAddress"));
         if (claim is null)
         {
             throw new BadRequestException("The user is not logged in");
@@ -63,5 +66,27 @@ public class UserService : IUserService
                 .Include(user => user.ProfilePicture)
                 .Include(user => user.CurrentBooks));
         return wantedUser;
+    }
+
+    public async Task UpdateUserAsync(User newUser)
+    {
+        var oldUser = await _userRepository.GetFirstOrThrowAsync(
+            filter: user => user.Id == newUser.Id,
+            include: query => query
+                .Include(user => user.ProfilePicture)
+        );
+        if (newUser.ProfilePicture?.FullPath != null 
+            && newUser.ProfilePicture?.FullPath != oldUser.ProfilePicture?.FullPath)
+        {
+            var pictureList = _imageService.MapPictures(new[] { newUser.ProfilePicture?.FullPath });
+            await _imageService.ClearUnusedImagesAsync(pictureList, newUser.Id, PictureOperationType.EditingUser);
+            oldUser.ProfilePicture = pictureList.FirstOrDefault();
+        }
+
+        oldUser.Email = newUser.Email;
+        oldUser.FirstName = newUser.FirstName;
+        oldUser.LastName = newUser.LastName;
+        oldUser.BirthDate = newUser.BirthDate;
+        await _userRepository.SaveChangesAsync();
     }
 }
