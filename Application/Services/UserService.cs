@@ -53,4 +53,15 @@ public class UserService : IUserService
             include: query => query.Include(u => u.Role));
         return user;
     }
+
+    public async Task<User> GetUserByIdAsync(int userId)
+    {
+        var wantedUser = await _userRepository.GetFirstOrThrowAsync(
+            filter: user => user.Id == userId,
+            include: query => query
+                .Include(user => user.Comments)
+                .Include(user => user.ProfilePicture)
+                .Include(user => user.CurrentBooks));
+        return wantedUser;
+    }
 }

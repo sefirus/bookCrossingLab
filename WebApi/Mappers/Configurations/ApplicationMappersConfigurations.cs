@@ -1,5 +1,4 @@
-﻿using System.Net.NetworkInformation;
-using Core.Entities;
+﻿using Core.Entities;
 using Core.Interfaces.Mappers;
 using Core.ViewModels.BookCopyViewModels;
 using Core.ViewModels.BookViewModels;
@@ -53,5 +52,6 @@ public static class ApplicationMappersConfigurations
         services.AddTransient<IVmMapper<UpdatePublisherViewModel, Publisher>, UpdatePublisherMapper>();
 
         services.AddTransient<IVmMapper<CreateUserViewModel, User>, CreateUserMapper>();
+        services.AddTransient<IVmMapper<User, ReadUserViewModel>, ReadUserMapper>();
     }
 }
