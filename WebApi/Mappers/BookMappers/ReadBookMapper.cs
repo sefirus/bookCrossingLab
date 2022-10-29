@@ -43,6 +43,13 @@ public class ReadBookMapper : IVmMapper<Book, ReadBookViewModel>
         {
             vm.Publisher = _publisherMapper.Map(source.Publisher);
         }
+
+        if (source.Pictures is not null && source.Pictures.Any())
+        {
+            vm.PictureLink = source.Pictures
+                .OrderBy(p => p.FullPath)
+                .FirstOrDefault()!.FullPath;
+        }
         return vm;
     }
 }

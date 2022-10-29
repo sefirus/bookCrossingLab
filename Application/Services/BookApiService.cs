@@ -247,7 +247,9 @@ public class BookApiService : IBookApiService
         }
 
         if (result.Count != 0) 
-            return result;
+            result = result.GroupBy(bc => bc.CategoryId)
+            .Select(grouping => grouping.First())
+            .ToList();
         
         var uncategorized = categories.FirstOrDefault(cat => cat.Name == "Uncategorized")!; 
         result.Add(new BookCategory()

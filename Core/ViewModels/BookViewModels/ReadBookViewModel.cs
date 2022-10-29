@@ -14,4 +14,5 @@ public class ReadBookViewModel
     public string Language { get; set; }
     public int PageCount { get; set; }
     public double Rate { get; set; }
+    public string PictureLink { get; set; } //TODO:implement retrieving a picture as well
 }

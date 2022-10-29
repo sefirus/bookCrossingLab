@@ -111,9 +111,10 @@ public class BookService : IBookService
             include: query => query
                 .Include(b => b.Publisher)
                 .Include(b => b.BookWriters)
-                .ThenInclude(bw => bw.Writer)
+                    .ThenInclude(bw => bw.Writer)
                 .Include(b => b.BookCategories)
-                .ThenInclude(bc => bc.Category));
+                    .ThenInclude(bc => bc.Category)
+                .Include(b => b.Pictures));
     }
     
     public async Task<IList<Book>> GetBooksByCategoryId(int categoryId)

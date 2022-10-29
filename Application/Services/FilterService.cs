@@ -97,7 +97,7 @@ public class FilterService : IFilterService
         IList<Book> books)
     {
         int max, min;
-        max = min = books.First().PageCount;
+        max = min = books.FirstOrDefault()?.PageCount ?? 0;
         var languages = new List<string>();
         foreach (var book in books)
         {
