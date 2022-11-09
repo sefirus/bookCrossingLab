@@ -2,6 +2,7 @@
 using System.Drawing.Imaging;
 using System.Linq.Expressions;
 using Core.Entities;
+using Core.Enums;
 using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
@@ -17,13 +18,19 @@ public class ShelfService : IShelfService
 {
     private readonly IRepository<Shelf> _shelfRepository;
     private readonly ICommentService _commentService;
+    private readonly IImageService _imageService;
+    private readonly IRepository<Picture> _pictureRepository;
 
     public ShelfService(
         IRepository<Shelf> shelfRepository,
-        ICommentService commentService)
+        ICommentService commentService, 
+        IImageService imageService, 
+        IRepository<Picture> pictureRepository)
     {
         _shelfRepository = shelfRepository;
         _commentService = commentService;
+        _imageService = imageService;
+        _pictureRepository = pictureRepository;
     }
 
     public async Task<IEnumerable<Shelf>> GetShelvesInAreaAsync(MapBoundaries boundaries)
@@ -44,7 +51,8 @@ public class ShelfService : IShelfService
         var procedures = await _shelfRepository.GetPaged(
             parameters: parameters,
             filter: filter,
-            orderBy: order);
+            orderBy: order,
+            include: query => query.Include(shelf => shelf.Pictures));
         return procedures;
     }
     
@@ -79,12 +87,24 @@ public class ShelfService : IShelfService
         return shelf;
     }
     
-    public async Task AddShelfAsync(Shelf shelf)
+    public async Task AddShelfAsync(Shelf shelf, User currentUser)
     {
-        //TODO: add image uploading like in articles of vetClinic
+        var possiblePicture = shelf.Pictures.FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(possiblePicture?.FullPath))
+        {
+            var pictureList = _imageService.MapPictures(new[] { possiblePicture.FullPath });
+            await _imageService.ClearUnusedImagesAsync(pictureList, currentUser.Id, PictureOperationType.EditingShelf);
+            shelf.Pictures = pictureList;
+        }
         shelf.CreatedAt = DateTime.Now;
         await _shelfRepository.InsertAsync(shelf);
         await _shelfRepository.SaveChangesAsync();
+        if (!string.IsNullOrWhiteSpace(possiblePicture?.FullPath))
+        {
+            possiblePicture.ShelfId = shelf.Id;
+            await _pictureRepository.InsertAsync(possiblePicture);
+            await _pictureRepository.SaveChangesAsync();
+        }
     }
 
     public async Task DeleteShelfByIdAsync(int shelfId)

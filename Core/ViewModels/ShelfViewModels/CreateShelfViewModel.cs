@@ -2,5 +2,5 @@
 
 public class CreateShelfViewModel : ShelfVmBase
 {
-    
+    public string PictureLink { get; set; }
 }

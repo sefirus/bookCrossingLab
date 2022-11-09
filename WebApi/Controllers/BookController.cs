@@ -23,6 +23,7 @@ public class BookController : ControllerBase
     private readonly IUserService _userService;
     private readonly IPagedVmMapper<Book, ReadBookViewModel> _pagedBookMapper;
     private readonly IFilterService _filterService;
+    private readonly IVmMapper<Book, ReadBookViewModel> _readBookMapper;
 
     public BookController(
         IBookService bookService, 
@@ -31,7 +32,8 @@ public class BookController : ControllerBase
         IPagedVmMapper<Comment, ReadCommentViewModel> pagedCommentMapper,
         ICommentService commentService, IUserService userService, 
         IPagedVmMapper<Book, ReadBookViewModel> pagedBookMapper, 
-        IFilterService filterService)
+        IFilterService filterService, 
+        IVmMapper<Book, ReadBookViewModel> readBookMapper)
     {
         _bookService = bookService;
         _bookApiService = bookApiService;
@@ -41,6 +43,15 @@ public class BookController : ControllerBase
         _userService = userService;
         _pagedBookMapper = pagedBookMapper;
         _filterService = filterService;
+        _readBookMapper = readBookMapper;
+    }
+
+    [HttpGet("{id:int:min(1)}")]
+    public async Task<ReadBookViewModel> GetBookByIdAsync([FromRoute] int id)
+    {
+        var book = await _bookService.GetBookByIdAsync(id);
+        var vm = _readBookMapper.Map(book);
+        return vm;
     }
 
     [HttpGet]

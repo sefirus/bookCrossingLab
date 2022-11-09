@@ -124,8 +124,7 @@ public class BookApiService : IBookApiService
 
     private bool ContainsTitle(string request, Book book, JaroWinkler comparer)
     {
-        var result = comparer.Similarity(request, book.Title) > 0.55 
-                     || comparer.Similarity(request, book.Description) > 0.55;
+        var result = comparer.Similarity(request, book.Title) > 0.55;
         return result;
     }
 

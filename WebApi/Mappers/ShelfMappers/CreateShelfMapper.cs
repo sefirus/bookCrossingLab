@@ -13,7 +13,11 @@ public class CreateShelfMapper : IVmMapper<CreateShelfViewModel, Shelf>
             Title = source.Title,
             FormattedAddress = source.FormattedAddress,
             Latitude = source.Latitude,
-            Longitude = source.Longitude
+            Longitude = source.Longitude,
+            Pictures = new List<Picture>()
+            {
+                new Picture(){ FullPath = source.PictureLink}
+            }
         };
         return shelf;
     }

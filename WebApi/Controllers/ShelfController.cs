@@ -82,12 +82,13 @@ public class ShelfController : ControllerBase
         return viewModels;
     }
 
-    [Authorize(Roles = "SUPER ADMIN,POWER USER")]
+    //[Authorize(Roles = "SUPER ADMIN,POWER USER")]
     [HttpPost]
     public async Task CreateShelf([FromBody] CreateShelfViewModel createVm)
     {
         var shelf = _createShelfMapper.Map(createVm);
-        await _shelfService.AddShelfAsync(shelf);
+        var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+        await _shelfService.AddShelfAsync(shelf, currentUser);
     }
 
     [Authorize(Roles = "SUPER ADMIN,POWER USER")]

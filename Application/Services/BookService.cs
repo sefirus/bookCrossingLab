@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Core.Entities;
+using Core.Exceptions;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.Pagination;
@@ -93,13 +94,15 @@ public class BookService : IBookService
         var categoryIds = parameters.CategoryIds.ToHashSet();
         var languages = parameters.Language.ToHashSet();
         var normalizedQuery = parameters.FilterParam?.ToUpper();
-        var filteredBooks = books.Where(book => PassesCategoryFilter(categoryIds, book)
-                                    && PassesPublisherFilter(publisherIds, book)
-                                    && PassesWriterFilter(writerIds, book)
-                                    && PassesLanguageFilter(languages, book)
-                                    && PassesSearch(normalizedQuery, book, jw)
-                                    && book.PageCount >= parameters.MinPageCount 
-                                    && book.PageCount <= parameters.MaxPageCount).ToList();
+        var filteredBooks = books
+            .Where(book => PassesCategoryFilter(categoryIds, book) 
+                           && PassesPublisherFilter(publisherIds, book) 
+                           && PassesWriterFilter(writerIds, book)
+                           && PassesLanguageFilter(languages, book)
+                           && PassesSearch(normalizedQuery, book, jw)
+                           && (parameters.MinPageCount == 0 ||book.PageCount >= parameters.MinPageCount)
+                           && (parameters.MaxPageCount == 0 ||book.PageCount <= parameters.MaxPageCount))
+            .ToList();
         var pagedBooks = filteredBooks.ToPagedList(parameters.PageNumber, parameters.PageSize);
         return pagedBooks;
     }
@@ -137,6 +140,18 @@ public class BookService : IBookService
     {
         var books = await GetFullyIncludedBooksAsync(book => book.PublisherId == publisherId);
         return books;
+    }
+
+    public async Task<Book> GetBookByIdAsync(int bookId)
+    {
+        var book = (await GetFullyIncludedBooksAsync(book => book.Id == bookId))
+            .FirstOrDefault();
+        if (book is null)
+        {
+            throw new NotFoundException("Wanted Book does not exist");
+        }
+
+        return book;
     }
 
     public double GetBookRate(Book book)

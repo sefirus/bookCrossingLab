@@ -14,4 +14,5 @@ public interface IBookService
     Task<IList<Book>> GetBooksByCategoryId(int categoryId);
     Task<IList<Book>> GetBooksByWriterId(int writerId);
     Task<IList<Book>> GetBooksByPublisherId(int publisherId);
+    Task<Book> GetBookByIdAsync(int bookId);
 }
