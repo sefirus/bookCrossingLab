@@ -64,7 +64,9 @@ public class UserService : IUserService
             include: query => query
                 .Include(user => user.Comments)
                 .Include(user => user.ProfilePicture)
-                .Include(user => user.CurrentBooks));
+                .Include(user => user.CurrentBooks)
+                    .ThenInclude(bookCopy => bookCopy.Book)
+                    .ThenInclude(book => book.Pictures));
         return wantedUser;
     }
 

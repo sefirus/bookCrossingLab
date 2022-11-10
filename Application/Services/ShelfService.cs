@@ -52,7 +52,10 @@ public class ShelfService : IShelfService
             parameters: parameters,
             filter: filter,
             orderBy: order,
-            include: query => query.Include(shelf => shelf.Pictures));
+            include: query => query.Include(shelf => shelf.Pictures)
+                .Include(shelf => shelf.BookCopies)
+                    .ThenInclude(bookCopy => bookCopy.Book)
+                    .ThenInclude(book => book.Pictures));
         return procedures;
     }
     
@@ -81,8 +84,9 @@ public class ShelfService : IShelfService
         var shelf = await _shelfRepository.GetFirstOrThrowAsync(
             filter: sh => sh.Id == shelfId,
             include: query => query.Include(sh => sh.Comments)
-                .Include(sh => sh.BookCopies)
-                .ThenInclude(bc => bc.Book)
+                .Include(shelf => shelf.BookCopies)
+                    .ThenInclude(bookCopy => bookCopy.Book)
+                    .ThenInclude(book => book.Pictures)
                 .Include(sh => sh.Pictures));
         return shelf;
     }
