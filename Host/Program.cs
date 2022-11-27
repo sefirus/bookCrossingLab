@@ -5,6 +5,7 @@ using BookCrossingBackEnd.Configuration;
 using BookCrossingBackEnd.Middleware;
 using DataAccess.Context;
 using DataAccess.Repositories.DiConfiguration;
+using DatabaseBenchmark;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -94,6 +95,7 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", corsPolicyBuilder =>
         .AllowAnyHeader();
 }));
 
+builder.Services.AddBenchmark();
 
 var app = builder.Build();
 
