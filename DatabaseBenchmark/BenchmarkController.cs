@@ -2,14 +2,7 @@
 using DataAccess.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-
 
 namespace DatabaseBenchmark;
 
@@ -45,6 +38,30 @@ public class BenchmarkController
         return stopWatch.Elapsed.Ticks;
     }
 
+    private async Task<long> RunTplRegular(Task seedingTask)
+    {
+        await seedingTask;
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+        var tplRegular = new Task<List<Shelf>>(_bookCrossingContext.Shelves.ToList);
+        tplRegular.Start();
+        tplRegular.Wait();
+        stopWatch.Stop();
+        return stopWatch.Elapsed.Ticks;
+    }
+
+    private async Task<long> RunTplParallel(Task seedingTask)
+    {
+        await seedingTask;
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+        var tplParallel = new Task<List<Shelf>>(_bookCrossingContext.Shelves.AsParallel().ToList);
+        tplParallel.Start();
+        tplParallel.Wait();
+        stopWatch.Stop();
+        return stopWatch.Elapsed.Ticks;
+    }
+
     [HttpGet]
     public async Task<BenchmarkResultModel> RunBenchmarkAsync()
     {
@@ -66,23 +83,8 @@ public class BenchmarkController
             HundredThousandsRows = parallel100000
         };
 
-        await _seeder.SeedTwentyAsync();
-        var stopWatch1 = new Stopwatch();
-        stopWatch1.Start();
-        var tplRegular20 = new Task<List<Shelf>>(_bookCrossingContext.Shelves.ToList);
-        tplRegular20.Start();
-        tplRegular20.Wait();
-        stopWatch1.Stop();
-        var tplRegular20Time =  stopWatch1.Elapsed.Ticks;
-        
-        await _seeder.SeedHundredThousandsAsync();
-        var stopWatch2 = new Stopwatch();
-        stopWatch2.Start();
-        var tplRegular100000 = new Task<List<Shelf>>(_bookCrossingContext.Shelves.ToList);
-        tplRegular100000.Start();
-        tplRegular100000.Wait();
-        stopWatch2.Stop();
-        var tplRegular100000Time =  stopWatch2.Elapsed.Ticks;
+        var tplRegular20Time = await RunTplRegular(_seeder.SeedTwentyAsync());
+        var tplRegular100000Time = await RunTplRegular(_seeder.SeedHundredThousandsAsync());
 
         result.TplRegular = new ConcreteResultModel()
         {
@@ -90,23 +92,8 @@ public class BenchmarkController
             HundredThousandsRows = tplRegular100000Time
         };
 
-        await _seeder.SeedTwentyAsync();
-        var stopWatch3 = new Stopwatch();
-        stopWatch3.Start();
-        var tplParallel20 = new Task<List<Shelf>>(_bookCrossingContext.Shelves.AsParallel().ToList);
-        tplParallel20.Start();
-        tplParallel20.Wait();
-        stopWatch3.Stop();
-        var tplParallel20Time = stopWatch3.Elapsed.Ticks;
-
-        await _seeder.SeedHundredThousandsAsync();
-        var stopWatch4 = new Stopwatch();
-        stopWatch4.Start();
-        var tplParallel100000 = new Task<List<Shelf>>(_bookCrossingContext.Shelves.AsParallel().ToList);
-        tplParallel100000.Start();
-        tplParallel100000.Wait();
-        stopWatch4.Stop();
-        var tplParallel100000Time = stopWatch4.Elapsed.Ticks;
+        var tplParallel20Time = await RunTplParallel(_seeder.SeedTwentyAsync());
+        var tplParallel100000Time = await RunTplParallel(_seeder.SeedHundredThousandsAsync());
 
         result.TplParallel = new ConcreteResultModel()
         {
