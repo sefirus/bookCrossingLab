@@ -8,7 +8,7 @@ namespace Application.Services;
 
 public class PublisherService : IPublisherService
 {
-    private readonly IRepository<Publisher> _publisherRepository;
+    private IRepository<Publisher> _publisherRepository;
     private readonly IRepository<Picture> _pictureRepository;
     private readonly IImageService _imageService;
 
@@ -27,6 +27,7 @@ public class PublisherService : IPublisherService
         var pictureList = _imageService.MapPictures(imageLinks);
         await _imageService.ClearUnusedImagesAsync(pictureList, userId, PictureOperationType.EditingPublisher);
         newPublisher.Pictures = pictureList;
+        _publisherRepository = new RepositoryDecorator<Publisher>(_publisherRepository);
         await _publisherRepository.InsertAsync(newPublisher);
         await _publisherRepository.SaveChangesAsync();
     }

@@ -1,6 +1,8 @@
-﻿namespace Core.Entities;
+﻿using Core.Interfaces;
 
-public class Publisher
+namespace Core.Entities;
+
+public class Publisher : ICreatableEntity
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -9,4 +11,5 @@ public class Publisher
     public string Description { get; set; }
     public IEnumerable<Book> Books { get; set; } 
         = new List<Book>();
+    public DateTime CreatedDate { get; set; }
 }

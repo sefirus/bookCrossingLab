@@ -15,6 +15,7 @@ public class Book
     public IEnumerable<Picture> Pictures { get; set; } 
         = new List<Picture>();
     public string Language { get; set; }
+    public DateTime CreatedDate { get; set; }
     public IEnumerable<BookCategory> BookCategories { get; set; }
         = new List<BookCategory>();
     public IEnumerable<Comment> Comments { get; set; } 
