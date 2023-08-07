@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "c5fd8e65-6745-4c7c-a928-f491c31ae88d",
+		"name": "FirstTest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "23240098-c5fd8e65-6745-4c7c-a928-f491c31ae88d"
+	},
+	"item": [
+		{
+			"name": "12345",
+			"id": "d2147768-e971-4ead-9e29-d620394d5d3a",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://apx-test-back.ienergy.halliburton.com/APXApi/api/Account/create-auto-test-account",
+					"protocol": "https",
+					"host": [
+						"apx-test-back",
+						"ienergy",
+						"halliburton",
+						"com"
+					],
+					"path": [
+						"APXApi",
+						"api",
+						"Account",
+						"create-auto-test-account"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
